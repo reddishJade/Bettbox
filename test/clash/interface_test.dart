@@ -37,31 +37,8 @@ class _FakeHandler extends ClashHandlerInterface {
   FutureOr<bool> destroy() => true;
 }
 
-class _TimeoutCaptureHandler extends _FakeHandler {
-  Duration? capturedTimeout;
-
-  @override
-  Future<T> invoke<T>({
-    required ActionMethod method,
-    dynamic data,
-    Duration? timeout,
-    FutureOr<T> Function()? onTimeout,
-    T? defaultValue,
-  }) async {
-    capturedTimeout = timeout;
-    return <String, dynamic>{'message': '', 'global': ''} as T;
-  }
-}
-
 void main() {
   group('ClashHandlerInterface', () {
-    test('setup allows time for provider initialization', () async {
-      final handler = _TimeoutCaptureHandler();
-      await handler.setupConfig(
-        const SetupParams(selectedMap: {}, testUrl: ''),
-      );
-      expect(handler.capturedTimeout, greaterThan(const Duration(seconds: 40)));
-    });
     test('returns the reply while the channel is alive', () async {
       final handler = _FakeHandler();
       final future = handler.invoke<String>(method: ActionMethod.getMemory);

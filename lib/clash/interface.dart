@@ -400,8 +400,7 @@ abstract class ClashHandlerInterface with ClashInterface {
     final data = await invoke<dynamic>(
       method: ActionMethod.setupConfig,
       data: params,
-      // Provider initialization can perform sequential proxy and rule downloads.
-      timeout: const Duration(minutes: 3),
+      timeout: const Duration(seconds: 15),
       onTimeout: () => throw TimeoutException('setupConfig timeout'),
     );
     return SetupResult.fromData(data);
