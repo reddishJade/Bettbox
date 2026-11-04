@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
@@ -116,20 +114,6 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
         tooltip: appLocalizations.runtimeConfig,
         icon: const Icon(Icons.description_outlined),
       ),
-      IconButton(
-        onPressed: () {
-          final profiles = globalState.config.profiles;
-          showSheet(
-            context: context,
-            builder: (_, type) {
-              return ReorderableProfilesSheet(type: type, profiles: profiles);
-            },
-          );
-        },
-        tooltip: appLocalizations.sort,
-        icon: const Icon(Icons.sort),
-        iconSize: 26,
-      ),
     ];
   }
 
@@ -196,19 +180,67 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
                   crossAxisSpacing: 14,
                   crossAxisCount: columns,
                   children: [
-                    for (
-                      int i = 0;
-                      i < profilesSelectorState.profiles.length;
-                      i++
-                    )
+                    for (final profile in profilesSelectorState.profiles)
                       GridItem(
-                        child: ProfileItem(
-                          key: Key(profilesSelectorState.profiles[i].id),
-                          profile: profilesSelectorState.profiles[i],
-                          groupValue: profilesSelectorState.currentProfileId,
-                          onChanged: (profileId) {
-                            ref.read(currentProfileIdProvider.notifier).value =
-                                profileId;
+                        key: ValueKey(profile.id),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final card = ProfileItem(
+                              profile: profile,
+                              groupValue:
+                                  profilesSelectorState.currentProfileId,
+                              onChanged: (profileId) {
+                                ref
+                                        .read(currentProfileIdProvider.notifier)
+                                        .value =
+                                    profileId;
+                              },
+                            );
+                            return DragTarget<String>(
+                              onWillAcceptWithDetails: (details) =>
+                                  details.data != profile.id,
+                              onAcceptWithDetails: (details) {
+                                final profiles = List<Profile>.of(
+                                  globalState.config.profiles,
+                                );
+                                final from = profiles.indexWhere(
+                                  (p) => p.id == details.data,
+                                );
+                                final to = profiles.indexWhere(
+                                  (p) => p.id == profile.id,
+                                );
+                                if (from < 0 || to < 0 || from == to) return;
+                                final moved = profiles.removeAt(from);
+                                profiles.insert(to, moved);
+                                globalState.appController.setProfiles(profiles);
+                              },
+                              builder: (context, candidates, rejected) {
+                                final feedback = Material(
+                                  color: Colors.transparent,
+                                  child: SizedBox(
+                                    width: constraints.maxWidth,
+                                    child: card,
+                                  ),
+                                );
+                                final placeholder = Opacity(
+                                  opacity: 0.35,
+                                  child: card,
+                                );
+                                return system.isDesktop
+                                    ? Draggable<String>(
+                                        data: profile.id,
+                                        feedback: feedback,
+                                        childWhenDragging: placeholder,
+                                        child: card,
+                                      )
+                                    : LongPressDraggable<String>(
+                                        data: profile.id,
+                                        feedback: feedback,
+                                        childWhenDragging: placeholder,
+                                        child: card,
+                                      );
+                              },
+                            );
                           },
                         ),
                       ),
@@ -616,112 +648,7 @@ class ProfileItem extends StatelessWidget {
     return CommonCard(
       isSelected: profile.id == groupValue,
       onPressed: isTV ? null : () => onChanged(profile.id),
-      onLongPress: isTV ? null : () => _previewRuntimeConfig(context, profile),
       child: isTV ? _buildTVLayout(context) : _buildNormalLayout(context),
-    );
-  }
-}
-
-class ReorderableProfilesSheet extends StatefulWidget {
-  final List<Profile> profiles;
-  final SheetType type;
-
-  const ReorderableProfilesSheet({
-    super.key,
-    required this.profiles,
-    required this.type,
-  });
-
-  @override
-  State<ReorderableProfilesSheet> createState() =>
-      _ReorderableProfilesSheetState();
-}
-
-class _ReorderableProfilesSheetState extends State<ReorderableProfilesSheet> {
-  late List<Profile> profiles;
-
-  @override
-  void initState() {
-    super.initState();
-    profiles = List.from(widget.profiles);
-  }
-
-  Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
-    final profile = profiles[index];
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (_, Widget? child) {
-        final double animValue = Curves.easeInOut.transform(animation.value);
-        final double scale = lerpDouble(1, 1.02, animValue)!;
-        return Transform.scale(scale: scale, child: child);
-      },
-      child: Container(
-        key: Key(profile.id),
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: CommonCard(
-          type: CommonCardType.filled,
-          child: ListTile(
-            contentPadding: const EdgeInsets.only(right: 44, left: 16),
-            title: EmojiText(profile.label ?? profile.id),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AdaptiveSheetScaffold(
-      type: widget.type,
-      actions: [
-        IconButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            globalState.appController.setProfiles(profiles);
-          },
-          icon: Icon(Icons.save),
-        ),
-      ],
-      body: ReorderableListView.builder(
-        buildDefaultDragHandles: false,
-        padding: EdgeInsets.fromLTRB(
-          12,
-          16,
-          12,
-          32 + MediaQuery.paddingOf(context).bottom,
-        ),
-        proxyDecorator: proxyDecorator,
-        // ignore: deprecated_member_use
-        onReorder: (oldIndex, newIndex) {
-          setState(() {
-            if (oldIndex < newIndex) {
-              newIndex -= 1;
-            }
-            final profile = profiles.removeAt(oldIndex);
-            profiles.insert(newIndex, profile);
-          });
-        },
-        itemBuilder: (_, index) {
-          final profile = profiles[index];
-          return Container(
-            key: Key(profile.id),
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: CommonCard(
-              type: CommonCardType.filled,
-              child: ListTile(
-                contentPadding: const EdgeInsets.only(right: 16, left: 16),
-                title: EmojiText(profile.label ?? profile.id),
-                trailing: ReorderableDragStartListener(
-                  index: index,
-                  child: const Icon(Icons.drag_handle),
-                ),
-              ),
-            ),
-          );
-        },
-        itemCount: profiles.length,
-      ),
-      title: appLocalizations.profilesSort,
     );
   }
 }
