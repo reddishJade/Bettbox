@@ -49,7 +49,7 @@ jobs:
         run: |
           $coreHash = (Get-FileHash libclash/windows/BettboxCore.exe -Algorithm SHA256).Hash.ToLower()
           $flutterArgs = @(
-            'build', 'windows', '--release',
+            'build', 'windows', '--release', '--verbose',
             "--dart-define=CORE_SHA256=$coreHash",
             '--dart-define=APP_ENV=pre',
             '--dart-define=APP_ASSET_SUFFIX=windows-amd64-setup.exe'
