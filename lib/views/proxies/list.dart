@@ -394,6 +394,9 @@ class _GroupHeader extends ConsumerWidget {
         .getSafeValue('');
 
     final selectedProxyIcon = ref.watch(proxyIconProvider(selectedProxyName));
+    final selectedProxy = group.all
+        .where((proxy) => proxy.name == selectedProxyName)
+        .firstOrNull;
 
     final showFilled = iconStyle == ProxiesIconStyle.none;
     final expandIcon = CommonExpandIcon(
@@ -462,6 +465,13 @@ class _GroupHeader extends ConsumerWidget {
                             style: labelLightStyle,
                             overflow: TextOverflow.ellipsis,
                           ),
+                        ),
+                        const SizedBox(width: 8),
+                        ProxyDelayText(
+                          proxy:
+                              selectedProxy ??
+                              Proxy(name: selectedProxyName, type: ''),
+                          testUrl: group.testUrl,
                         ),
                       ],
                     ],
