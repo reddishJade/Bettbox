@@ -15,6 +15,34 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'add_profile.dart';
 
+Future<void> _previewRuntimeConfig(
+  BuildContext context,
+  Profile profile,
+) async {
+  await globalState.appController.safeRun(
+    () async {
+      final patchConfig = globalState.config.patchClashConfig;
+      final content = await globalState.getRuntimeConfigContent(
+        patchConfig: patchConfig,
+        profile: profile,
+      );
+      if (!context.mounted) {
+        return;
+      }
+
+      final previewPage = EditorPage(
+        title:
+            '${appLocalizations.runtimeConfig} - ${profile.label ?? profile.id}',
+        content: content,
+        readOnly: true,
+      );
+      BaseNavigator.push<String>(context, previewPage, maintainState: false);
+    },
+    needLoading: true,
+    title: appLocalizations.tip,
+  );
+}
+
 class ProfilesView extends ConsumerStatefulWidget {
   const ProfilesView({super.key});
 
@@ -75,6 +103,18 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
         },
         icon: const Icon(Icons.sync),
         tooltip: appLocalizations.syncAll,
+      ),
+      IconButton(
+        onPressed: () {
+          final profile = ref.read(currentProfileProvider);
+          if (profile == null) {
+            context.showSnackBar(appLocalizations.checkOrAddProfile);
+            return;
+          }
+          _previewRuntimeConfig(context, profile);
+        },
+        tooltip: appLocalizations.runtimeConfig,
+        icon: const Icon(Icons.description_outlined),
       ),
       IconButton(
         onPressed: () {
@@ -206,31 +246,6 @@ class ProfileItem extends StatelessWidget {
       return;
     }
     await globalState.appController.deleteProfile(profile.id);
-  }
-
-  Future<void> _handlePreviewRuntimeConfig(BuildContext context) async {
-    await globalState.appController.safeRun(
-      () async {
-        final patchConfig = globalState.config.patchClashConfig;
-        final content = await globalState.getRuntimeConfigContent(
-          patchConfig: patchConfig,
-          profile: profile,
-        );
-        if (!context.mounted) {
-          return;
-        }
-
-        final previewPage = EditorPage(
-          title:
-              '${appLocalizations.runtimeConfig} - ${profile.label ?? profile.id}',
-          content: content,
-          readOnly: true,
-        );
-        BaseNavigator.push<String>(context, previewPage, maintainState: false);
-      },
-      needLoading: true,
-      title: appLocalizations.tip,
-    );
   }
 
   Future updateProfile() async {
@@ -475,6 +490,11 @@ class ProfileItem extends StatelessWidget {
         },
       ),
       PopupMenuItemData(
+        icon: Icons.description_outlined,
+        label: appLocalizations.runtimeConfig,
+        onPressed: () => _previewRuntimeConfig(context, profile),
+      ),
+      PopupMenuItemData(
         icon: Icons.file_copy_outlined,
         label: appLocalizations.exportFile,
         onPressed: () {
@@ -596,7 +616,7 @@ class ProfileItem extends StatelessWidget {
     return CommonCard(
       isSelected: profile.id == groupValue,
       onPressed: isTV ? null : () => onChanged(profile.id),
-      onLongPress: isTV ? null : () => _handlePreviewRuntimeConfig(context),
+      onLongPress: isTV ? null : () => _previewRuntimeConfig(context, profile),
       child: isTV ? _buildTVLayout(context) : _buildNormalLayout(context),
     );
   }
