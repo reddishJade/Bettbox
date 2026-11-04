@@ -1610,6 +1610,19 @@ class AppController {
     }
   }
 
+  Future<void> createLocalProfile() async {
+    final created = await safeRun<bool>(() async {
+      final profile = await Profile.normal(
+        label: appLocalizations.localFile,
+      ).saveFile(utf8.encode('proxies: []\nproxy-groups: []\nrules: []\n'));
+      await addProfile(profile);
+      return true;
+    }, needLoading: true, silence: false);
+    if (created != true) return;
+    globalState.navigatorKey.currentState?.popUntil((route) => route.isFirst);
+    toProfiles();
+  }
+
   Future<void> addProfileFormFile() async {
     final platformFiles = await safeRun(
       () => picker.pickerFiles(
