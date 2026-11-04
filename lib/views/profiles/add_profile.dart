@@ -151,23 +151,6 @@ class AddProfileView extends StatelessWidget {
                   endIndent: 16,
                 ),
                 ListItem(
-                  leading: const Icon(Icons.note_add_outlined),
-                  title: Text(appLocalizations.create),
-                  subtitle: Text(appLocalizations.localFile),
-                  onTap: globalState.appController.createLocalProfile,
-                ),
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: context.colorScheme.outlineVariant.withValues(
-                    alpha: context.colorScheme.brightness == Brightness.light
-                        ? 0.6
-                        : 0.45,
-                  ),
-                  indent: 16,
-                  endIndent: 16,
-                ),
-                ListItem(
                   leading: const Icon(Icons.upload_file_sharp),
                   title: Text(appLocalizations.file),
                   subtitle: Text(appLocalizations.fileDesc),
