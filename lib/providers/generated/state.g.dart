@@ -48,7 +48,7 @@ final class ConfigStateProvider
   }
 }
 
-String _$configStateHash() => r'd827b2e403f65301fc2b85ed4e84d6243cc44586';
+String _$configStateHash() => r'bbbca5d5c3193f19bd19f3824cf3797498db0770';
 
 @ProviderFor(currentGroupsState)
 final currentGroupsStateProvider = CurrentGroupsStateProvider._();
@@ -187,7 +187,7 @@ final class CurrentNavigationItemsStateProvider
 }
 
 String _$currentNavigationItemsStateHash() =>
-    r'159f22cdd09a4393e53d08d5ea1542df64710fd7';
+    r'fbc884c8bedca810890380aab1a9663a025d258a';
 
 @ProviderFor(coreState)
 final coreStateProvider = CoreStateProvider._();
@@ -2419,11 +2419,11 @@ final needSetupProvider = NeedSetupProvider._();
 final class NeedSetupProvider
     extends
         $FunctionalProvider<
-          VM4<String?, String?, Dns?, String?>,
-          VM4<String?, String?, Dns?, String?>,
-          VM4<String?, String?, Dns?, String?>
+          VM3<String?, Dns?, String?>,
+          VM3<String?, Dns?, String?>,
+          VM3<String?, Dns?, String?>
         >
-    with $Provider<VM4<String?, String?, Dns?, String?>> {
+    with $Provider<VM3<String?, Dns?, String?>> {
   NeedSetupProvider._()
     : super(
         from: null,
@@ -2440,26 +2440,25 @@ final class NeedSetupProvider
 
   @$internal
   @override
-  $ProviderElement<VM4<String?, String?, Dns?, String?>> $createElement(
+  $ProviderElement<VM3<String?, Dns?, String?>> $createElement(
     $ProviderPointer pointer,
   ) => $ProviderElement(pointer);
 
   @override
-  VM4<String?, String?, Dns?, String?> create(Ref ref) {
+  VM3<String?, Dns?, String?> create(Ref ref) {
     return needSetup(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(VM4<String?, String?, Dns?, String?> value) {
+  Override overrideWithValue(VM3<String?, Dns?, String?> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride:
-          $SyncValueProvider<VM4<String?, String?, Dns?, String?>>(value),
+      providerOverride: $SyncValueProvider<VM3<String?, Dns?, String?>>(value),
     );
   }
 }
 
-String _$needSetupHash() => r'9983a9f3d6bb5340e08bc56c5ef7e9285fde50c9';
+String _$needSetupHash() => r'297513c4ee8e0a16afdd7e189c0993f77514138f';
 
 @ProviderFor(currentBrightness)
 final currentBrightnessProvider = CurrentBrightnessProvider._();

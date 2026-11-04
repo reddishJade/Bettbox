@@ -1,6 +1,5 @@
 // ignore_for_file: invalid_annotation_target
 
-import 'dart:io';
 import 'dart:math';
 
 import 'package:bett_box/common/common.dart';
@@ -1143,57 +1142,4 @@ extension ResultExt on Result {
   bool get isError => type == ResultType.error;
 
   bool get isSuccess => type == ResultType.success;
-}
-
-@freezed
-abstract class Script with _$Script {
-  const factory Script({
-    required String id,
-    required String label,
-    @Default('') String content,
-    String? url,
-    @JsonKey(name: 'custom-options') Map<String, bool>? customOptions,
-    String? digest,
-    @Default(false) bool compatible,
-    bool? volatile,
-  }) = _Script;
-
-  factory Script.create({required String label, String? url}) {
-    return Script(id: utils.uuidV4, label: label, url: url);
-  }
-
-  factory Script.fromJson(Map<String, Object?> json) => _$ScriptFromJson(json);
-}
-
-final volatileScriptPattern = RegExp(r'\bDate\b|Math\s*\.\s*random');
-
-extension ScriptExt on Script {
-  Future<String> readContent() async {
-    if (content.isNotEmpty) return content;
-    final file = File(await appPath.getScriptPath(id));
-    if (!await file.exists()) return '';
-    return file.readAsString();
-  }
-
-  Future<Script> writeContent(String value) async {
-    final path = await appPath.getScriptPath(id);
-    final temp = File('$path.${DateTime.now().microsecondsSinceEpoch}.tmp');
-    await temp.parent.create(recursive: true);
-    await temp.writeAsString(value, flush: true);
-    await temp.rename(path);
-    final head = value.length > 2000 ? value.substring(0, 2000) : value;
-    return copyWith(
-      content: '',
-      digest: value.toMd5(),
-      compatible: head.contains('Compatible_With_Bettbox'),
-      volatile: volatileScriptPattern.hasMatch(value),
-    );
-  }
-
-  Future<void> deleteContent() async {
-    final file = File(await appPath.getScriptPath(id));
-    if (await file.exists()) {
-      await file.delete();
-    }
-  }
 }

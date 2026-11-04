@@ -48,7 +48,6 @@ Config configState(Ref ref) {
   final networkProps = ref.watch(networkSettingProvider);
   final vpnProps = ref.watch(vpnSettingProvider);
   final proxiesStyle = ref.watch(proxiesStyleSettingProvider);
-  final scriptProps = ref.watch(scriptStateProvider);
   final hotKeyActions = ref.watch(hotKeyActionsProvider);
   final dav = ref.watch(appDAVSettingProvider);
   final windowProps = ref.watch(windowSettingProvider);
@@ -56,7 +55,6 @@ Config configState(Ref ref) {
     dav: dav,
     windowProps: windowProps,
     hotKeyActions: hotKeyActions,
-    scriptProps: scriptProps,
     proxiesStyle: proxiesStyle,
     vpnProps: vpnProps,
     networkProps: networkProps,
@@ -950,11 +948,8 @@ ColorScheme genColorScheme(
 }
 
 @riverpod
-VM4<String?, String?, Dns?, String?> needSetup(Ref ref) {
+VM3<String?, Dns?, String?> needSetup(Ref ref) {
   final profileId = ref.watch(currentProfileIdProvider);
-  final scriptDigest = ref.watch(
-    scriptStateProvider.select((state) => state.currentScript?.digest),
-  );
   final overrideDns = ref.watch(overrideDnsProvider);
   final dns = overrideDns == true
       ? ref.watch(patchClashConfigProvider.select((state) => state.dns))
@@ -963,7 +958,7 @@ VM4<String?, String?, Dns?, String?> needSetup(Ref ref) {
       ref.watch(vpnSettingProvider.select((state) => state.loopbackProtection))
       ? ref.watch(patchClashConfigProvider.select((state) => state.listenPorts))
       : null;
-  return VM4(a: profileId, b: scriptDigest, c: dns, d: loopbackPorts);
+  return VM3(a: profileId, b: dns, c: loopbackPorts);
 }
 
 @riverpod

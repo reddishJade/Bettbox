@@ -160,16 +160,6 @@ class AppLocalizations {
     );
   }
 
-  /// `Configure JavaScript override scripts`
-  String get scriptDesc {
-    return Intl.message(
-      'Configure JavaScript override scripts',
-      name: 'scriptDesc',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Traffic Usage`
   String get trafficUsage {
     return Intl.message(
@@ -5530,11 +5520,6 @@ class AppLocalizations {
     return Intl.message('No $label', name: 'nullTip', desc: '', args: [label]);
   }
 
-  /// `Override Script`
-  String get script {
-    return Intl.message('Override Script', name: 'script', desc: '', args: []);
-  }
-
   /// `Color`
   String get color {
     return Intl.message('Color', name: 'color', desc: '', args: []);
@@ -5548,16 +5533,6 @@ class AppLocalizations {
   /// `Unnamed`
   String get unnamed {
     return Intl.message('Unnamed', name: 'unnamed', desc: '', args: []);
-  }
-
-  /// `Please enter a script name`
-  String get pleaseEnterScriptName {
-    return Intl.message(
-      'Please enter a script name',
-      name: 'pleaseEnterScriptName',
-      desc: '',
-      args: [],
-    );
   }
 
   /// `Mixed Port`
@@ -5810,26 +5785,6 @@ class AppLocalizations {
     return Intl.message('Custom', name: 'custom', desc: '', args: []);
   }
 
-  /// `Custom Rule Switch`
-  String get customScriptOptions {
-    return Intl.message(
-      'Custom Rule Switch',
-      name: 'customScriptOptions',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Other Settings`
-  String get scriptOtherOptions {
-    return Intl.message(
-      'Other Settings',
-      name: 'scriptOtherOptions',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Wakelock`
   String get wakelock {
     return Intl.message('Wakelock', name: 'wakelock', desc: '', args: []);
@@ -5905,16 +5860,6 @@ class AppLocalizations {
     return Intl.message(
       'Enable max refresh rate',
       name: 'highRefreshRateDesc',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Use Global Script Override`
-  String get useGlobalScriptOverride {
-    return Intl.message(
-      'Use Global Script Override',
-      name: 'useGlobalScriptOverride',
       desc: '',
       args: [],
     );

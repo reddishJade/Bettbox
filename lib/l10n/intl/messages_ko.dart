@@ -421,7 +421,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "cubeGrid": MessageLookupByLibrary.simpleMessage("큐브 그리드"),
     "custom": MessageLookupByLibrary.simpleMessage("사용자 지정"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage("사용자 지정 제목"),
-    "customScriptOptions": MessageLookupByLibrary.simpleMessage("커스텀 규칙"),
     "customUrl": MessageLookupByLibrary.simpleMessage("사용자 지정 URL"),
     "cut": MessageLookupByLibrary.simpleMessage("잘라내기"),
     "dancingSquare": MessageLookupByLibrary.simpleMessage("댄싱 스퀘어"),
@@ -1250,9 +1249,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseCloseTunFirst": MessageLookupByLibrary.simpleMessage(
       "먼저 TUN 모드를 꺼주세요",
     ),
-    "pleaseEnterScriptName": MessageLookupByLibrary.simpleMessage(
-      "스크립트 이름을 입력하세요",
-    ),
     "pleaseInputAdminPassword": MessageLookupByLibrary.simpleMessage(
       "관리자 비밀번호를 입력하세요",
     ),
@@ -1449,11 +1445,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "save": MessageLookupByLibrary.simpleMessage("저장"),
     "saveChanges": MessageLookupByLibrary.simpleMessage("변경사항을 저장하시겠습니까?"),
     "saveTip": MessageLookupByLibrary.simpleMessage("저장하시겠습니까?"),
-    "script": MessageLookupByLibrary.simpleMessage("오버라이드 스크립트"),
-    "scriptDesc": MessageLookupByLibrary.simpleMessage(
-      "JavaScript 오버라이드 스크립트 설정",
-    ),
-    "scriptOtherOptions": MessageLookupByLibrary.simpleMessage("기타 설정"),
     "search": MessageLookupByLibrary.simpleMessage("검색"),
     "seconds": MessageLookupByLibrary.simpleMessage("초"),
     "secretCopied": MessageLookupByLibrary.simpleMessage("비밀번호가 클립보드에 복사되었습니다"),
@@ -1776,9 +1767,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "url": MessageLookupByLibrary.simpleMessage("URL"),
     "urlDesc": MessageLookupByLibrary.simpleMessage("URL 주소로 프로필 가져오기"),
     "urlTip": m51,
-    "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
-      "글로벌 스크립트 오버라이드 사용",
-    ),
     "useHosts": MessageLookupByLibrary.simpleMessage("Hosts 사용"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage("시스템 Hosts 사용"),
     "userAuth": MessageLookupByLibrary.simpleMessage("사용자 인증"),

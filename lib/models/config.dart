@@ -127,7 +127,8 @@ List<SidebarFlyoutEntry> sidebarFlyoutEntriesSafeFromJson(
 ) {
   try {
     return sidebarFlyoutEntries
-            ?.map((e) => $enumDecode(_$SidebarFlyoutEntryEnumMap, e))
+            ?.where((e) => _$SidebarFlyoutEntryEnumMap.containsValue(e))
+            .map((e) => $enumDecode(_$SidebarFlyoutEntryEnumMap, e))
             .toList() ??
         defaultSidebarFlyoutEntries;
   } catch (_) {
@@ -445,53 +446,6 @@ abstract class ThemeProps with _$ThemeProps {
 }
 
 @freezed
-abstract class ScriptProps with _$ScriptProps {
-  const factory ScriptProps({
-    String? currentId,
-    @Default([]) List<Script> scripts,
-  }) = _ScriptProps;
-
-  factory ScriptProps.fromJson(Map<String, Object?> json) =>
-      _$ScriptPropsFromJson(json);
-}
-
-extension ScriptPropsExt on ScriptProps {
-  String? get realId {
-    final index = scripts.indexWhere((script) => script.id == currentId);
-    if (index != -1) {
-      return currentId;
-    }
-    return null;
-  }
-
-  Script? get currentScript {
-    final index = scripts.indexWhere((script) => script.id == currentId);
-    if (index != -1) {
-      return scripts[index];
-    }
-    return null;
-  }
-
-  Future<ScriptProps> externalize() async {
-    if (scripts.every((script) => script.content.isEmpty)) return this;
-    final next = <Script>[];
-    for (final script in scripts) {
-      if (script.content.isEmpty) {
-        next.add(script);
-        continue;
-      }
-      try {
-        next.add(await script.writeContent(script.content));
-      } catch (e) {
-        commonPrint.error('Failed to store script ${script.label}: $e');
-        next.add(script);
-      }
-    }
-    return copyWith(scripts: next);
-  }
-}
-
-@freezed
 abstract class Config with _$Config {
   const factory Config({
     @JsonKey(fromJson: AppSettingProps.safeFromJson)
@@ -517,7 +471,6 @@ abstract class Config with _$Config {
     @JsonKey(fromJson: ClashConfig.safeFormJson)
     @Default(defaultClashConfig)
     ClashConfig patchClashConfig,
-    @Default(ScriptProps()) ScriptProps scriptProps,
     @Default('') String nodeExcludeFilter,
     @Default(5000) int healthCheckTimeout,
   }) = _Config;

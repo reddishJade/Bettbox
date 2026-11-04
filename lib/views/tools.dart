@@ -116,7 +116,6 @@ List<ToolsShortcut> getToolsShortcuts(
             builder: (_) => const ResourcesView(),
             wrap: false,
           ),
-          SidebarFlyoutEntry.script => null,
           SidebarFlyoutEntry.toolbox => buildNavigationShortcut(
             PageLabel.toolbox,
           ),

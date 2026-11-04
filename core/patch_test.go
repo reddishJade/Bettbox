@@ -337,37 +337,6 @@ rules:
 	}
 }
 
-func TestDecodeScriptedConfig(t *testing.T) {
-	rawCfg, err := decodeScriptedConfig([]byte(`{"mixed-port":7891,"mode":"global","rules":["MATCH,Main"],"proxies":[{"name":"A","type":"ss","port":443,"ratio":1.5,"opts":{"mtu":1400,"ids":[1,2]}}],"proxy-groups":[{"name":"Main","type":"select","proxies":["A"],"tolerance":50}],"proxy-providers":{},"dns":{"enable":true,"nameserver-policy":{"+.b.com":"1.1.1.1","+.a.com":["8.8.8.8"]}}}`))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if rawCfg.MixedPort != 7891 || rawCfg.Mode != tunnel.Global || !reflect.DeepEqual(rawCfg.Rule, []string{"MATCH,Main"}) {
-		t.Errorf("typed fields: %d %v %v", rawCfg.MixedPort, rawCfg.Mode, rawCfg.Rule)
-	}
-	proxy := rawCfg.Proxy[0]
-	if proxy["port"] != 443 || proxy["ratio"] != 1.5 {
-		t.Errorf("numbers: port %v (%T), ratio %v (%T)", proxy["port"], proxy["port"], proxy["ratio"], proxy["ratio"])
-	}
-	opts := proxy["opts"].(map[string]any)
-	if opts["mtu"] != 1400 || !reflect.DeepEqual(opts["ids"], []any{1, 2}) {
-		t.Errorf("nested numbers: %v", opts)
-	}
-	if rawCfg.ProxyGroup[0]["tolerance"] != 50 {
-		t.Errorf("group number: %v", rawCfg.ProxyGroup[0]["tolerance"])
-	}
-	if rawCfg.ProxyProvider == nil {
-		t.Errorf("an empty proxy-providers object should stay non-nil")
-	}
-	policy := rawCfg.DNS.NameServerPolicy
-	if policy == nil || policy.Oldest().Key != "+.b.com" {
-		t.Errorf("nameserver-policy order should be kept")
-	}
-	if !rawCfg.DNS.UseHosts {
-		t.Errorf("defaults should apply to keys the script left out")
-	}
-}
-
 func TestDisabledGroupsCascade(t *testing.T) {
 	rawCfg, err := config.UnmarshalRawConfig([]byte(`proxies:
   - {name: A, type: ss, server: a.com, port: 1, cipher: aes-128-gcm, password: x}

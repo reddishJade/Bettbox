@@ -86,17 +86,12 @@ void main() {
     expect(connections, resources + 1);
     expect(items[resources].modes, contains(NavigationItemMode.desktop));
     expect(items[resources].modes, isNot(contains(NavigationItemMode.more)));
-    expect(items.any((item) => item.label == PageLabel.script), isFalse);
   });
 
-  test('resources and scripts are absent from settings shortcuts', () {
+  test('resources are absent from settings shortcuts', () {
     expect(
       SidebarFlyoutEntry.supportedValues,
       isNot(contains(SidebarFlyoutEntry.resources)),
-    );
-    expect(
-      SidebarFlyoutEntry.supportedValues,
-      isNot(contains(SidebarFlyoutEntry.script)),
     );
   });
 }

@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
@@ -291,67 +290,6 @@ class ProxiesStyleSetting extends _$ProxiesStyleSetting
 
   void updateState(ProxiesStyle Function(ProxiesStyle state) builder) {
     state = builder(state);
-  }
-}
-
-@riverpod
-class ScriptState extends _$ScriptState with AutoDisposeNotifierMixin {
-  @override
-  ScriptProps build() {
-    return globalState.config.scriptProps;
-  }
-
-  @override
-  onUpdate(value) {
-    globalState.config = globalState.config.copyWith(scriptProps: value);
-  }
-
-  void setScript(Script script) {
-    final list = List<Script>.from(state.scripts);
-    final index = list.indexWhere((item) => item.id == script.id);
-    if (index != -1) {
-      list[index] = script;
-    } else {
-      list.add(script);
-    }
-    state = state.copyWith(scripts: list);
-  }
-
-  void setId(String id) {
-    state = state.copyWith(currentId: state.currentId != id ? id : null);
-  }
-
-  void del(String id) {
-    final list = List<Script>.from(state.scripts);
-    final index = list.indexWhere((item) => item.label == id);
-    if (index != -1) {
-      unawaited(list.removeAt(index).deleteContent());
-    }
-    final nextId = id == state.currentId ? null : state.currentId;
-    state = state.copyWith(scripts: list, currentId: nextId);
-  }
-
-  bool isExits(String label) {
-    return state.scripts.indexWhere((item) => item.label == label) != -1;
-  }
-
-  String getAvailableLabel(String baseLabel) {
-    if (!isExits(baseLabel)) {
-      return baseLabel;
-    }
-    var i = 1;
-    while (isExits('$baseLabel$i')) {
-      i++;
-    }
-    return '$baseLabel$i';
-  }
-
-  Future<void> syncScript(String id) async {
-    final script = state.scripts.firstWhere((item) => item.id == id);
-    final url = script.url;
-    if (url == null || url.isEmpty) return;
-    final res = await request.getTextResponseForUrl(url);
-    setScript(await script.writeContent(res.data));
   }
 }
 

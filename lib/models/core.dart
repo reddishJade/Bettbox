@@ -39,7 +39,6 @@ abstract class SetupParams with _$SetupParams {
     @JsonKey(name: 'override-test-url') @Default(true) bool overrideTestUrl,
     @JsonKey(name: 'profile-path') @Default('') String profilePath,
     @JsonKey(name: 'age-secret-key') @Default('') String ageSecretKey,
-    @JsonKey(name: 'scripted-config') @Default('') String scriptedConfig,
     Map<String, dynamic>? patch,
   }) = _SetupParams;
 

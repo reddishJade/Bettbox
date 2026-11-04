@@ -1611,13 +1611,17 @@ class AppController {
   }
 
   Future<void> createLocalProfile() async {
-    final created = await safeRun<bool>(() async {
-      final profile = await Profile.normal(
-        label: appLocalizations.localFile,
-      ).saveFile(utf8.encode('proxies: []\nproxy-groups: []\nrules: []\n'));
-      await addProfile(profile);
-      return true;
-    }, needLoading: true, silence: false);
+    final created = await safeRun<bool>(
+      () async {
+        final profile = await Profile.normal(
+          label: appLocalizations.localFile,
+        ).saveFile(utf8.encode('proxies: []\nproxy-groups: []\nrules: []\n'));
+        await addProfile(profile);
+        return true;
+      },
+      needLoading: true,
+      silence: false,
+    );
     if (created != true) return;
     globalState.navigatorKey.currentState?.popUntil((route) => route.isFirst);
     toProfiles();
@@ -1880,18 +1884,8 @@ class AppController {
   Future<List<int>> backupData({String password = ''}) async {
     final homeDirPath = await appPath.homeDirPath;
     final profilesPath = await appPath.profilesPath;
-    final scripts = await Future.wait(
-      globalState.config.scriptProps.scripts.map(
-        (script) async => script.copyWith(content: await script.readContent()),
-      ),
-    );
     final configJson =
-        json.decode(
-              json.encode(
-                globalState.config.copyWith.scriptProps(scripts: scripts),
-              ),
-            )
-            as Map<String, dynamic>;
+        json.decode(json.encode(globalState.config)) as Map<String, dynamic>;
     if (configJson['dav'] is Map) {
       final davMap = Map<String, dynamic>.from(configJson['dav'] as Map);
       if (davMap['user'] is String) {
@@ -2317,12 +2311,6 @@ class AppController {
 
     await restoreBackupFiles(profiles, homeDirPath);
 
-    if (recoveryOption != RecoveryOption.onlyProfiles) {
-      tempConfig = tempConfig.copyWith(
-        scriptProps: await tempConfig.scriptProps.externalize(),
-      );
-    }
-
     _recovery(tempConfig, recoveryOption);
     await savePreferences();
     if (globalState.isStart) {
@@ -2643,27 +2631,6 @@ class AppController {
       // 10. Restore hotkey settings (desktop only)
       if (system.isDesktop) {
         _ref.read(hotKeyActionsProvider.notifier).value = config.hotKeyActions;
-      }
-
-      // 11. Restore script settings
-      final scriptIds = config.scriptProps.scripts.map((e) => e.id).toSet();
-      final currentScriptProps = _ref.read(scriptStateProvider);
-      final localScripts = currentScriptProps.scripts.where(
-        (script) => !scriptIds.contains(script.id),
-      );
-      if (_ref.read(appSettingProvider).recoveryStrategy ==
-          RecoveryStrategy.override) {
-        for (final script in localScripts) {
-          unawaited(script.deleteContent());
-        }
-        _ref.read(scriptStateProvider.notifier).value = config.scriptProps;
-      } else {
-        _ref.read(scriptStateProvider.notifier).value = config.scriptProps
-            .copyWith(
-              currentId:
-                  config.scriptProps.currentId ?? currentScriptProps.currentId,
-              scripts: [...config.scriptProps.scripts, ...localScripts],
-            );
       }
     }
 

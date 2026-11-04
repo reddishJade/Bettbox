@@ -498,7 +498,6 @@ enum PageLabel {
   tools,
   logs,
   resources,
-  script,
   toolbox,
   connections,
 }
@@ -518,8 +517,6 @@ extension PageLabelExtension on PageLabel {
         return appLocalizations.logs;
       case PageLabel.resources:
         return appLocalizations.resources;
-      case PageLabel.script:
-        return appLocalizations.script;
       case PageLabel.toolbox:
         return appLocalizations.toolbox;
       case PageLabel.connections:
@@ -590,7 +587,6 @@ enum StartSwitchStyle { tonal, outlined }
 
 enum SidebarFlyoutEntry {
   resources,
-  script,
   toolbox,
   theme,
   backupAndRecovery,
@@ -604,15 +600,12 @@ enum SidebarFlyoutEntry {
   static List<SidebarFlyoutEntry> get supportedValues => values
       .where(
         (entry) =>
-            entry != script &&
-            entry != resources &&
-            (entry != loopback || system.isWindows),
+            entry != resources && (entry != loopback || system.isWindows),
       )
       .toList();
 
   String get localizedName => switch (this) {
     SidebarFlyoutEntry.resources => appLocalizations.resources,
-    SidebarFlyoutEntry.script => appLocalizations.script,
     SidebarFlyoutEntry.toolbox => appLocalizations.toolbox,
     SidebarFlyoutEntry.theme => appLocalizations.theme,
     SidebarFlyoutEntry.backupAndRecovery => appLocalizations.backupAndRecovery,

@@ -234,11 +234,6 @@ class GlobalState {
           networkProps: defaultNetworkProps,
           appSetting: defaultAppSettingProps,
         );
-    final scriptProps = await config.scriptProps.externalize();
-    if (scriptProps != config.scriptProps) {
-      config = config.copyWith(scriptProps: scriptProps);
-      await preferences.saveConfig(config);
-    }
     await globalState.migrateOldData(config);
     final locale =
         utils.getLocaleForString(config.appSetting.locale) ??

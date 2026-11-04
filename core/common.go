@@ -431,10 +431,6 @@ func setupKey(params *SetupParams, profile []byte) string {
 }
 
 func loadSetupConfig(params *SetupParams) (*config.RawConfig, string, string, error) {
-	if params.ScriptedConfig != "" {
-		rawCfg, global, err := loadPatchedConfig(params)
-		return rawCfg, global, "", err
-	}
 	if params.ProfilePath == "" {
 		return nil, "", "", errors.New("profile path is empty")
 	}
@@ -452,7 +448,7 @@ func loadSetupConfig(params *SetupParams) (*config.RawConfig, string, string, er
 }
 
 func prepareSetup(params *SetupParams) (*preparedSetup, error) {
-	if params.ScriptedConfig == "" && params.ProfilePath != "" {
+	if params.ProfilePath != "" {
 		buf, err := readFile(params.ProfilePath)
 		if err != nil {
 			return nil, err

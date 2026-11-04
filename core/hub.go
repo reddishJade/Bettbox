@@ -7,7 +7,6 @@ import (
 	"core/toolbox"
 	"encoding/json"
 	"fmt"
-	"math"
 	"net"
 	"os"
 	"regexp"
@@ -891,19 +890,7 @@ func parseProfile(bytes []byte, ageSecretKey string) (*config.RawConfig, error) 
 }
 
 func loadPatchedConfig(params *SetupParams) (*config.RawConfig, string, error) {
-	var rawCfg *config.RawConfig
-	var err error
-	if params.ScriptedConfig != "" {
-		defer os.Remove(params.ScriptedConfig)
-		var bytes []byte
-		bytes, err = readFile(params.ScriptedConfig)
-		if err != nil {
-			return nil, "", err
-		}
-		rawCfg, err = decodeScriptedConfig(bytes)
-	} else {
-		rawCfg, err = readProfile(params.ProfilePath, params.AgeSecretKey)
-	}
+	rawCfg, err := readProfile(params.ProfilePath, params.AgeSecretKey)
 	if err != nil {
 		return nil, "", err
 	}
@@ -917,72 +904,13 @@ func loadPatchedConfig(params *SetupParams) (*config.RawConfig, string, error) {
 	return rawCfg, global, nil
 }
 
-func decodeScriptedConfig(data []byte) (*config.RawConfig, error) {
-	rawCfg := config.DefaultRawConfig()
-	scripted := struct {
-		*config.RawConfig
-		Rules []string `json:"rules"`
-	}{RawConfig: rawCfg}
-	if err := json.Unmarshal(data, &scripted); err != nil {
-		return config.UnmarshalRawConfig(data)
-	}
-	if scripted.Rules != nil {
-		rawCfg.Rule = scripted.Rules
-	}
-	for _, item := range rawCfg.Proxy {
-		normalizeJsonNumbers(item)
-	}
-	for _, item := range rawCfg.ProxyGroup {
-		normalizeJsonNumbers(item)
-	}
-	for _, item := range rawCfg.Listeners {
-		normalizeJsonNumbers(item)
-	}
-	for _, item := range rawCfg.ProxyProvider {
-		normalizeJsonNumbers(item)
-	}
-	for _, item := range rawCfg.RuleProvider {
-		normalizeJsonNumbers(item)
-	}
-	normalizeJsonNumbers(rawCfg.Hosts)
-	return rawCfg, nil
-}
-
-func normalizeJsonNumbers(value any) any {
-	switch typed := value.(type) {
-	case float64:
-		if typed == math.Trunc(typed) && math.Abs(typed) < 1<<53 {
-			return int(typed)
-		}
-	case map[string]any:
-		for key, item := range typed {
-			typed[key] = normalizeJsonNumbers(item)
-		}
-	case []any:
-		for index, item := range typed {
-			typed[index] = normalizeJsonNumbers(item)
-		}
-	}
-	return value
-}
-
 func handleGetRuntimeConfig(params *SetupParams) (string, error) {
-	scripted := params.ScriptedConfig != ""
-	path := params.ProfilePath
-	if scripted {
-		path = params.ScriptedConfig
-	}
-	source, err := readFile(path)
+	source, err := readFile(params.ProfilePath)
 	if err != nil {
 		return "", err
 	}
-	var before *config.RawConfig
-	if scripted {
-		before, err = decodeScriptedConfig(source)
-	} else {
-		source = patchYamlShortID(source)
-		before, err = parseProfile(source, params.AgeSecretKey)
-	}
+	source = patchYamlShortID(source)
+	before, err := parseProfile(source, params.AgeSecretKey)
 	if err != nil {
 		return "", err
 	}
@@ -1275,4 +1203,3 @@ func handleClearRequests() bool {
 	requestHistory = nil
 	return true
 }
-

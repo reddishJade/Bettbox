@@ -840,58 +840,6 @@ abstract class _$ProxiesStyleSetting extends $Notifier<ProxiesStyle> {
   }
 }
 
-@ProviderFor(ScriptState)
-final scriptStateProvider = ScriptStateProvider._();
-
-final class ScriptStateProvider
-    extends $NotifierProvider<ScriptState, ScriptProps> {
-  ScriptStateProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'scriptStateProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$scriptStateHash();
-
-  @$internal
-  @override
-  ScriptState create() => ScriptState();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ScriptProps value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<ScriptProps>(value),
-    );
-  }
-}
-
-String _$scriptStateHash() => r'83560787d30773ddd76a4b279b149f190f94c756';
-
-abstract class _$ScriptState extends $Notifier<ScriptProps> {
-  ScriptProps build();
-  @$mustCallSuper
-  @override
-  WhenComplete runBuild() {
-    final ref = this.ref as $Ref<ScriptProps, ScriptProps>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<ScriptProps, ScriptProps>,
-              ScriptProps,
-              Object?,
-              Object?
-            >;
-    return element.handleCreate(ref, build);
-  }
-}
-
 @ProviderFor(PatchClashConfig)
 final patchClashConfigProvider = PatchClashConfigProvider._();
 

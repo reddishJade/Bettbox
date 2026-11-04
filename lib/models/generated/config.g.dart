@@ -291,7 +291,6 @@ const _$MediaPlatformEnumMap = {
 
 const _$SidebarFlyoutEntryEnumMap = {
   SidebarFlyoutEntry.resources: 'resources',
-  SidebarFlyoutEntry.script: 'script',
   SidebarFlyoutEntry.toolbox: 'toolbox',
   SidebarFlyoutEntry.theme: 'theme',
   SidebarFlyoutEntry.backupAndRecovery: 'backupAndRecovery',
@@ -643,21 +642,6 @@ const _$DynamicSchemeVariantEnumMap = {
   DynamicSchemeVariant.fruitSalad: 'fruitSalad',
 };
 
-_ScriptProps _$ScriptPropsFromJson(Map<String, dynamic> json) => _ScriptProps(
-  currentId: json['currentId'] as String?,
-  scripts:
-      (json['scripts'] as List<dynamic>?)
-          ?.map((e) => Script.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
-);
-
-Map<String, dynamic> _$ScriptPropsToJson(_ScriptProps instance) =>
-    <String, dynamic>{
-      'currentId': instance.currentId,
-      'scripts': instance.scripts,
-    };
-
 _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(
   appSetting: json['appSetting'] == null
       ? defaultAppSettingProps
@@ -704,9 +688,6 @@ _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(
       : ClashConfig.safeFormJson(
           json['patchClashConfig'] as Map<String, Object?>?,
         ),
-  scriptProps: json['scriptProps'] == null
-      ? const ScriptProps()
-      : ScriptProps.fromJson(json['scriptProps'] as Map<String, dynamic>),
   nodeExcludeFilter: json['nodeExcludeFilter'] as String? ?? '',
   healthCheckTimeout: (json['healthCheckTimeout'] as num?)?.toInt() ?? 5000,
 );
@@ -729,7 +710,6 @@ Map<String, dynamic> _$ConfigToJson(_Config instance) => <String, dynamic>{
   'proxiesStyle': instance.proxiesStyle,
   'windowProps': instance.windowProps,
   'patchClashConfig': instance.patchClashConfig,
-  'scriptProps': instance.scriptProps,
   'nodeExcludeFilter': instance.nodeExcludeFilter,
   'healthCheckTimeout': instance.healthCheckTimeout,
 };

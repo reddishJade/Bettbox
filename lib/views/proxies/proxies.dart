@@ -10,7 +10,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../profiles/scripts.dart' show showGroupSwitchOptions;
+import 'group_switch_options.dart';
 import 'advanced_settings.dart';
 import 'setting.dart';
 import 'tab.dart';

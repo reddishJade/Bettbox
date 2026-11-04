@@ -520,7 +520,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
       "Пользовательский заголовок",
     ),
-    "customScriptOptions": MessageLookupByLibrary.simpleMessage("Свои правила"),
     "customUrl": MessageLookupByLibrary.simpleMessage("Пользовательский URL"),
     "cut": MessageLookupByLibrary.simpleMessage("Вырезать"),
     "dancingSquare": MessageLookupByLibrary.simpleMessage("Танцующий квадрат"),
@@ -1553,9 +1552,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseCloseTunFirst": MessageLookupByLibrary.simpleMessage(
       "Сначала отключите режим TUN",
     ),
-    "pleaseEnterScriptName": MessageLookupByLibrary.simpleMessage(
-      "Введите название скрипта",
-    ),
     "pleaseInputAdminPassword": MessageLookupByLibrary.simpleMessage(
       "Введите пароль администратора",
     ),
@@ -1820,13 +1816,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "save": MessageLookupByLibrary.simpleMessage("Сохранить"),
     "saveChanges": MessageLookupByLibrary.simpleMessage("Сохранить изменения?"),
     "saveTip": MessageLookupByLibrary.simpleMessage("Сохранить изменения?"),
-    "script": MessageLookupByLibrary.simpleMessage("Скрипт переопределения"),
-    "scriptDesc": MessageLookupByLibrary.simpleMessage(
-      "Настройка скриптов переопределения на JavaScript",
-    ),
-    "scriptOtherOptions": MessageLookupByLibrary.simpleMessage(
-      "Другие настройки",
-    ),
     "search": MessageLookupByLibrary.simpleMessage("Поиск"),
     "seconds": MessageLookupByLibrary.simpleMessage("секунд"),
     "secretCopied": MessageLookupByLibrary.simpleMessage(
@@ -2233,9 +2222,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "url": MessageLookupByLibrary.simpleMessage("URL"),
     "urlDesc": MessageLookupByLibrary.simpleMessage("Получить профиль по URL"),
     "urlTip": m51,
-    "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
-      "Глобальное переопределение",
-    ),
     "useHosts": MessageLookupByLibrary.simpleMessage("Использовать hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage(
       "Использовать системные hosts",

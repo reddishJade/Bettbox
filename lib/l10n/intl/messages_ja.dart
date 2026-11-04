@@ -413,7 +413,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "cubeGrid": MessageLookupByLibrary.simpleMessage("キューブグリッド"),
     "custom": MessageLookupByLibrary.simpleMessage("カスタム"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage("カスタムタイトル"),
-    "customScriptOptions": MessageLookupByLibrary.simpleMessage("カスタムルール"),
     "customUrl": MessageLookupByLibrary.simpleMessage("カスタムURL"),
     "cut": MessageLookupByLibrary.simpleMessage("切り取り"),
     "dancingSquare": MessageLookupByLibrary.simpleMessage("ダンシングスクエア"),
@@ -1240,9 +1239,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseCloseTunFirst": MessageLookupByLibrary.simpleMessage(
       "最初にTUNモードをオフにしてください",
     ),
-    "pleaseEnterScriptName": MessageLookupByLibrary.simpleMessage(
-      "スクリプト名を入力してください",
-    ),
     "pleaseInputAdminPassword": MessageLookupByLibrary.simpleMessage(
       "管理者パスワードを入力してください",
     ),
@@ -1447,11 +1443,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "save": MessageLookupByLibrary.simpleMessage("保存"),
     "saveChanges": MessageLookupByLibrary.simpleMessage("変更を保存しますか？"),
     "saveTip": MessageLookupByLibrary.simpleMessage("保存してもよろしいですか？"),
-    "script": MessageLookupByLibrary.simpleMessage("オーバーライドスクリプト"),
-    "scriptDesc": MessageLookupByLibrary.simpleMessage(
-      "JavaScript オーバーライドスクリプトを設定",
-    ),
-    "scriptOtherOptions": MessageLookupByLibrary.simpleMessage("その他の設定"),
     "search": MessageLookupByLibrary.simpleMessage("検索"),
     "seconds": MessageLookupByLibrary.simpleMessage("秒"),
     "secretCopied": MessageLookupByLibrary.simpleMessage(
@@ -1778,9 +1769,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "url": MessageLookupByLibrary.simpleMessage("URL"),
     "urlDesc": MessageLookupByLibrary.simpleMessage("URLから設定を取得"),
     "urlTip": m51,
-    "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
-      "グローバルスクリプトオーバーライドを使用",
-    ),
     "useHosts": MessageLookupByLibrary.simpleMessage("Hostsを使用"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage("システムHostsを使用"),
     "userAuth": MessageLookupByLibrary.simpleMessage("ユーザー認証"),

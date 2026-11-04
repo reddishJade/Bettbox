@@ -4,7 +4,6 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/editor.dart';
-import 'api/script.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -67,7 +66,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => 834704942;
+  int get rustContentHash => 966264984;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -125,18 +124,6 @@ abstract class RustLibApi extends BaseApi {
     required BigInt start,
     required BigInt end,
   });
-
-  Future<void> crateApiScriptCancelScript({required int token});
-
-  Future<ScriptOutput> crateApiScriptEvaluateScriptFile({
-    required String script,
-    required String inputPath,
-    required String outputPath,
-    String? customOptions,
-    required int token,
-  });
-
-  Future<String> crateApiScriptExtractScriptOptions({required String script});
 
   Future<List<RustFoldRange>> crateApiEditorFoldsComputeAll({
     required RopeBridge rope,
@@ -550,112 +537,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiScriptCancelScript({required int token}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_u_32(token, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 12,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: null,
-        ),
-        constMeta: kCrateApiScriptCancelScriptConstMeta,
-        argValues: [token],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiScriptCancelScriptConstMeta =>
-      const TaskConstMeta(debugName: "cancel_script", argNames: ["token"]);
-
-  @override
-  Future<ScriptOutput> crateApiScriptEvaluateScriptFile({
-    required String script,
-    required String inputPath,
-    required String outputPath,
-    String? customOptions,
-    required int token,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(script, serializer);
-          sse_encode_String(inputPath, serializer);
-          sse_encode_String(outputPath, serializer);
-          sse_encode_opt_String(customOptions, serializer);
-          sse_encode_u_32(token, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 13,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_script_output,
-          decodeErrorData: sse_decode_script_error,
-        ),
-        constMeta: kCrateApiScriptEvaluateScriptFileConstMeta,
-        argValues: [script, inputPath, outputPath, customOptions, token],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiScriptEvaluateScriptFileConstMeta =>
-      const TaskConstMeta(
-        debugName: "evaluate_script_file",
-        argNames: [
-          "script",
-          "inputPath",
-          "outputPath",
-          "customOptions",
-          "token",
-        ],
-      );
-
-  @override
-  Future<String> crateApiScriptExtractScriptOptions({required String script}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(script, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 14,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: sse_decode_script_error,
-        ),
-        constMeta: kCrateApiScriptExtractScriptOptionsConstMeta,
-        argValues: [script],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiScriptExtractScriptOptionsConstMeta =>
-      const TaskConstMeta(
-        debugName: "extract_script_options",
-        argNames: ["script"],
-      );
-
-  @override
   Future<List<RustFoldRange>> crateApiEditorFoldsComputeAll({
     required RopeBridge rope,
     required BigInt tabSize,
@@ -672,7 +553,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 15,
+            funcId: 12,
             port: port_,
           );
         },
@@ -707,7 +588,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             serializer,
           );
           sse_encode_usize(targetOffset, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_usize,
@@ -744,7 +625,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_usize(firstVisible, serializer);
           sse_encode_usize(lastVisible, serializer);
           sse_encode_usize(tabSize, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_guide_block,
@@ -770,7 +651,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(text, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_list_prim_u_32_strict,
@@ -795,7 +676,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_String,
@@ -821,7 +702,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(text, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_32_strict,
@@ -846,7 +727,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 21,
+            funcId: 18,
             port: port_,
           );
         },
@@ -881,7 +762,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_bool(isRegex, serializer);
           sse_encode_bool(caseSensitive, serializer);
           sse_encode_bool(wholeWord, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_list_prim_u_32_strict,
@@ -918,7 +799,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_bool(caseSensitive, serializer);
           sse_encode_bool(wholeWord, serializer);
           sse_encode_String(replacement, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_String,
@@ -964,7 +845,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 24,
+            funcId: 21,
             port: port_,
           );
         },
@@ -1086,12 +967,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<ScriptLog> dco_decode_list_script_log(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_script_log).toList();
-  }
-
-  @protected
   String? dco_decode_opt_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_String(raw);
@@ -1118,50 +993,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return RustFoldRange(
       startLine: dco_decode_i_32(arr[0]),
       endLine: dco_decode_i_32(arr[1]),
-    );
-  }
-
-  @protected
-  ScriptError dco_decode_script_error(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return ScriptError(
-      kind: dco_decode_script_error_kind(arr[0]),
-      message: dco_decode_String(arr[1]),
-      stack: dco_decode_opt_String(arr[2]),
-      logs: dco_decode_list_script_log(arr[3]),
-    );
-  }
-
-  @protected
-  ScriptErrorKind dco_decode_script_error_kind(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return ScriptErrorKind.values[raw as int];
-  }
-
-  @protected
-  ScriptLog dco_decode_script_log(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return ScriptLog(
-      level: dco_decode_String(arr[0]),
-      text: dco_decode_String(arr[1]),
-    );
-  }
-
-  @protected
-  ScriptOutput dco_decode_script_output(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return ScriptOutput(
-      logs: dco_decode_list_script_log(arr[0]),
-      elapsedMs: dco_decode_u_32(arr[1]),
     );
   }
 
@@ -1318,18 +1149,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<ScriptLog> sse_decode_list_script_log(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <ScriptLog>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_script_log(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
   String? sse_decode_opt_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -1370,44 +1189,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_startLine = sse_decode_i_32(deserializer);
     var var_endLine = sse_decode_i_32(deserializer);
     return RustFoldRange(startLine: var_startLine, endLine: var_endLine);
-  }
-
-  @protected
-  ScriptError sse_decode_script_error(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_kind = sse_decode_script_error_kind(deserializer);
-    var var_message = sse_decode_String(deserializer);
-    var var_stack = sse_decode_opt_String(deserializer);
-    var var_logs = sse_decode_list_script_log(deserializer);
-    return ScriptError(
-      kind: var_kind,
-      message: var_message,
-      stack: var_stack,
-      logs: var_logs,
-    );
-  }
-
-  @protected
-  ScriptErrorKind sse_decode_script_error_kind(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return ScriptErrorKind.values[inner];
-  }
-
-  @protected
-  ScriptLog sse_decode_script_log(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_level = sse_decode_String(deserializer);
-    var var_text = sse_decode_String(deserializer);
-    return ScriptLog(level: var_level, text: var_text);
-  }
-
-  @protected
-  ScriptOutput sse_decode_script_output(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_logs = sse_decode_list_script_log(deserializer);
-    var var_elapsedMs = sse_decode_u_32(deserializer);
-    return ScriptOutput(logs: var_logs, elapsedMs: var_elapsedMs);
   }
 
   @protected
@@ -1559,18 +1340,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_script_log(
-    List<ScriptLog> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_script_log(item, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -1614,38 +1383,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.startLine, serializer);
     sse_encode_i_32(self.endLine, serializer);
-  }
-
-  @protected
-  void sse_encode_script_error(ScriptError self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_script_error_kind(self.kind, serializer);
-    sse_encode_String(self.message, serializer);
-    sse_encode_opt_String(self.stack, serializer);
-    sse_encode_list_script_log(self.logs, serializer);
-  }
-
-  @protected
-  void sse_encode_script_error_kind(
-    ScriptErrorKind self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_script_log(ScriptLog self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.level, serializer);
-    sse_encode_String(self.text, serializer);
-  }
-
-  @protected
-  void sse_encode_script_output(ScriptOutput self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_script_log(self.logs, serializer);
-    sse_encode_u_32(self.elapsedMs, serializer);
   }
 
   @protected

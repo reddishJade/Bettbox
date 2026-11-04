@@ -1,5 +1,5 @@
 import 'package:bett_box/common/print.dart';
-import 'package:code_forge/script.dart';
+import 'package:code_forge/code_forge.dart';
 
 Future<bool>? _rustLibReady;
 

@@ -46,7 +46,6 @@ type SetupParams struct {
 	OverrideTestUrl bool              `json:"override-test-url"`
 	ProfilePath     string            `json:"profile-path"`
 	AgeSecretKey    string            `json:"age-secret-key"`
-	ScriptedConfig  string            `json:"scripted-config"`
 	Patch           *PatchParams      `json:"patch"`
 }
 

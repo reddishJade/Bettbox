@@ -12,7 +12,6 @@ _SetupParams _$SetupParamsFromJson(Map<String, dynamic> json) => _SetupParams(
   overrideTestUrl: json['override-test-url'] as bool? ?? true,
   profilePath: json['profile-path'] as String? ?? '',
   ageSecretKey: json['age-secret-key'] as String? ?? '',
-  scriptedConfig: json['scripted-config'] as String? ?? '',
   patch: json['patch'] as Map<String, dynamic>?,
 );
 
@@ -23,7 +22,6 @@ Map<String, dynamic> _$SetupParamsToJson(_SetupParams instance) =>
       'override-test-url': instance.overrideTestUrl,
       'profile-path': instance.profilePath,
       'age-secret-key': instance.ageSecretKey,
-      'scripted-config': instance.scriptedConfig,
       'patch': instance.patch,
     };
 

@@ -503,9 +503,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
       "عنوان سفارشی",
     ),
-    "customScriptOptions": MessageLookupByLibrary.simpleMessage(
-      "قوانین سفارشی",
-    ),
     "customUrl": MessageLookupByLibrary.simpleMessage("آدرس URL سفارشی"),
     "cut": MessageLookupByLibrary.simpleMessage("برش"),
     "dancingSquare": MessageLookupByLibrary.simpleMessage("مربع رقصان"),
@@ -1520,9 +1517,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseCloseTunFirst": MessageLookupByLibrary.simpleMessage(
       "لطفاً ابتدا حالت TUN را غیرفعال کنید",
     ),
-    "pleaseEnterScriptName": MessageLookupByLibrary.simpleMessage(
-      "لطفاً نام اسکریپت را وارد کنید",
-    ),
     "pleaseInputAdminPassword": MessageLookupByLibrary.simpleMessage(
       "لطفاً رمز عبور Admin را وارد کنید",
     ),
@@ -1793,11 +1787,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "saveTip": MessageLookupByLibrary.simpleMessage(
       "آیا از ذخیره تغییرات اطمینان دارید؟",
     ),
-    "script": MessageLookupByLibrary.simpleMessage("اسکریپت اورراید"),
-    "scriptDesc": MessageLookupByLibrary.simpleMessage(
-      "پیکربندی اسکریپت‌های اورراید JavaScript",
-    ),
-    "scriptOtherOptions": MessageLookupByLibrary.simpleMessage("تنظیمات دیگر"),
     "search": MessageLookupByLibrary.simpleMessage("جستجو"),
     "seconds": MessageLookupByLibrary.simpleMessage("ثانیه"),
     "secretCopied": MessageLookupByLibrary.simpleMessage(
@@ -2180,9 +2169,6 @@ class MessageLookup extends MessageLookupByLibrary {
       "دریافت پروفایل از طریق آدرس URL",
     ),
     "urlTip": m51,
-    "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
-      "استفاده از اسکریپت اورراید سراسری",
-    ),
     "useHosts": MessageLookupByLibrary.simpleMessage("استفاده از Hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage(
       "استفاده از Hosts سیستم",

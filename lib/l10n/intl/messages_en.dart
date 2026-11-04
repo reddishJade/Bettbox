@@ -502,9 +502,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
       "Custom Title",
     ),
-    "customScriptOptions": MessageLookupByLibrary.simpleMessage(
-      "Custom Rule Switch",
-    ),
     "customUrl": MessageLookupByLibrary.simpleMessage("Custom URL"),
     "cut": MessageLookupByLibrary.simpleMessage("Cut"),
     "dancingSquare": MessageLookupByLibrary.simpleMessage("Dancing Square"),
@@ -1499,9 +1496,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseCloseTunFirst": MessageLookupByLibrary.simpleMessage(
       "Please close TUN first",
     ),
-    "pleaseEnterScriptName": MessageLookupByLibrary.simpleMessage(
-      "Please enter a script name",
-    ),
     "pleaseInputAdminPassword": MessageLookupByLibrary.simpleMessage(
       "Please enter the admin password",
     ),
@@ -1757,13 +1751,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "saveChanges": MessageLookupByLibrary.simpleMessage("Save changes?"),
     "saveTip": MessageLookupByLibrary.simpleMessage(
       "Are you sure you want to save?",
-    ),
-    "script": MessageLookupByLibrary.simpleMessage("Override Script"),
-    "scriptDesc": MessageLookupByLibrary.simpleMessage(
-      "Configure JavaScript override scripts",
-    ),
-    "scriptOtherOptions": MessageLookupByLibrary.simpleMessage(
-      "Other Settings",
     ),
     "search": MessageLookupByLibrary.simpleMessage("Search"),
     "seconds": MessageLookupByLibrary.simpleMessage("Seconds"),
@@ -2143,9 +2130,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "url": MessageLookupByLibrary.simpleMessage("URL"),
     "urlDesc": MessageLookupByLibrary.simpleMessage("Get profile via URL"),
     "urlTip": m51,
-    "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
-      "Use Global Script Override",
-    ),
     "useHosts": MessageLookupByLibrary.simpleMessage("Use Hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage("Use System Hosts"),
     "userAuth": MessageLookupByLibrary.simpleMessage("User Authentication"),

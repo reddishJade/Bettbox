@@ -16,9 +16,6 @@ func runtimeConfigFor(t *testing.T, name, content string, patch *PatchParams) st
 		t.Fatal(err)
 	}
 	params := &SetupParams{ProfilePath: path, Patch: patch}
-	if strings.HasSuffix(name, ".json") {
-		params = &SetupParams{ScriptedConfig: path, Patch: patch}
-	}
 	out, err := handleGetRuntimeConfig(params)
 	if err != nil {
 		t.Fatal(err)
@@ -118,24 +115,5 @@ rules:
 	}
 	if !strings.Contains(out, "  - name: H\n    proxies:\n      - DIRECT\n    type: fallback\n") {
 		t.Fatalf("merge key not expanded:\n%s", out)
-	}
-}
-
-func TestRuntimeConfigScriptedUsesBlockStyle(t *testing.T) {
-	scripted := `{"mixed-port":7890,"proxies":[{"name":"A","type":"ss","server":"a.com","port":1,"cipher":"aes-128-gcm","password":"0123"}],"rules":["MATCH,DIRECT"]}`
-	out := runtimeConfigFor(t, "s.json", scripted, nil)
-	want := `mixed-port: 7890
-proxies:
-  - name: A
-    type: ss
-    server: a.com
-    port: 1
-    cipher: aes-128-gcm
-    password: "0123"
-rules:
-  - MATCH,DIRECT
-`
-	if out != want {
-		t.Fatalf("got:\n%s\nwant:\n%s", out, want)
 	}
 }
