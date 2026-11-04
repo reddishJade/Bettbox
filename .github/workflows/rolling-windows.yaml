@@ -3,6 +3,10 @@ name: Windows rolling build
 on:
   workflow_dispatch:
 
+concurrency:
+  group: windows-rolling-release
+  cancel-in-progress: false
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   SENTRY_BACKEND: none
@@ -74,3 +78,39 @@ jobs:
             dist/*.exe
             dist/*.zip
           if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
+        with:
+          name: Bettbox-windows-amd64-rolling
+          path: dist
+      - name: Publish rolling release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          installers=(dist/*-windows-amd64-setup.exe)
+          portable=(dist/*-windows-amd64-portable.zip)
+          if [[ ${#installers[@]} -ne 1 || ${#portable[@]} -ne 1 ]]; then
+            echo 'Expected one Windows x64 installer and one portable archive' >&2
+            exit 1
+          fi
+          {
+            printf 'Windows x64 rolling build from commit `%s`.\n\n' "$GITHUB_SHA"
+            printf '%s\n' '- Download the setup executable or portable ZIP.' '- These binaries are unsigned.' '' 'SHA-256:' '```'
+            (cd dist && sha256sum "$(basename "${portable[0]}")" "$(basename "${installers[0]}")")
+            printf '%s\n' '```'
+          } > release-notes.md
+          gh release upload rolling "${installers[0]}" "${portable[0]}" --clobber
+          old_sha=$(git ls-remote origin refs/tags/rolling | cut -f1)
+          test -n "$old_sha"
+          git push origin --force-with-lease="refs/tags/rolling:$old_sha" "$GITHUB_SHA:refs/tags/rolling"
+          gh release edit rolling --target "$GITHUB_SHA" --notes-file release-notes.md --prerelease --latest=false
