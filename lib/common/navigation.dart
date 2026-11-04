@@ -46,6 +46,13 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
       ),
       NavigationItem(
+        keep: false,
+        icon: const Icon(Icons.rule),
+        label: PageLabel.rules,
+        builder: (_) => RulesView(key: const GlobalObjectKey(PageLabel.rules)),
+        modes: [NavigationItemMode.desktop, NavigationItemMode.more],
+      ),
+      NavigationItem(
         icon: Icon(Icons.cable_rounded),
         label: PageLabel.connections,
         builder: (_) =>

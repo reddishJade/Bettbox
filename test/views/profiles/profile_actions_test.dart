@@ -83,7 +83,8 @@ void main() {
       (item) => item.label == PageLabel.connections,
     );
     expect(resources, profiles + 1);
-    expect(connections, resources + 1);
+    expect(items[resources + 1].label, PageLabel.rules);
+    expect(connections, resources + 2);
     expect(items[resources].modes, contains(NavigationItemMode.desktop));
     expect(items[resources].modes, isNot(contains(NavigationItemMode.more)));
   });

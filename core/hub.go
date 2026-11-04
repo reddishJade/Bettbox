@@ -292,6 +292,27 @@ func marshalProxies(proxies map[string]constant.Proxy) ([]byte, error) {
 	return json.Marshal(payload)
 }
 
+func handleGetRules() string {
+	runLock.Lock()
+	defer runLock.Unlock()
+	if !isInit {
+		return ""
+	}
+	rules := make([]map[string]string, 0)
+	for _, rule := range tunnel.Rules() {
+		rules = append(rules, map[string]string{
+			"type":    rule.RuleType().String(),
+			"payload": rule.Payload(),
+			"proxy":   rule.Adapter(),
+		})
+	}
+	data, err := json.Marshal(rules)
+	if err != nil {
+		return ""
+	}
+	return string(data)
+}
+
 func handleGetProxies() string {
 	runLock.Lock()
 	defer runLock.Unlock()

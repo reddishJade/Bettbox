@@ -52,6 +52,8 @@ mixin ClashInterface {
 
   FutureOr<String> getProxies();
 
+  FutureOr<String> getRules();
+
   FutureOr<String> changeProxy(ChangeProxyParams changeProxyParams);
 
   Future<bool> startListener();
@@ -414,6 +416,14 @@ abstract class ClashHandlerInterface with ClashInterface {
     return invoke<String>(
       method: ActionMethod.getProxies,
       timeout: Duration(seconds: 5),
+    );
+  }
+
+  @override
+  Future<String> getRules() {
+    return invoke<String>(
+      method: ActionMethod.getRules,
+      timeout: const Duration(seconds: 5),
     );
   }
 
