@@ -180,7 +180,9 @@ class AppController {
     }
     await _initCore();
 
-    final configured = setupConfig ? await _setupCoreConfig() : false;
+    final configured = setupConfig && (wasRunning || !system.isDesktop)
+        ? await _setupCoreConfig()
+        : false;
     if (refreshData && configured) {
       await updateGroups();
       await updateProviders();
@@ -200,12 +202,18 @@ class AppController {
 
   Future<void> _updateStatus(bool isStart) async {
     if (isStart) {
-      await _fastStart();
+      try {
+        await _fastStart();
+      } catch (_) {
+        lastProfileModified = null;
+        rethrow;
+      }
       if (globalState.isStart && !_ref.read(runTimeProvider.notifier).isStart) {
         _ref.read(runTimeProvider.notifier).value = 0;
       }
     } else {
       await globalState.handleStop();
+      lastProfileModified = null;
       clashCore.resetTraffic();
       _ref.read(trafficsProvider.notifier).clear();
       _ref.read(totalTrafficProvider.notifier).value = Traffic();
@@ -225,7 +233,11 @@ class AppController {
     final isDesktop = system.isDesktop;
 
     if (isDesktop && patchConfig.tun.enable) {
-      await _quickSetupConfig(enableTun: false);
+      final configured = await _quickSetupConfig(enableTun: false);
+      if (configured != true) {
+        await clashCore.stopListener();
+        return;
+      }
 
       if (system.isMacOS || system.isLinux) {
         try {
@@ -283,6 +295,7 @@ class AppController {
       final setupResult = await _quickSetupConfig();
       if (setupResult != true) {
         commonPrint.error('Fast start aborted: setupConfig failed');
+        await clashCore.stopListener();
         return;
       }
     }
@@ -661,6 +674,7 @@ class AppController {
   }
 
   Future<void> _updateClashConfig() async {
+    if (system.isDesktop && !globalState.isStart) return;
     await _initCore();
     final updateParams = _ref.read(updateParamsProvider);
     final tunResult = await _requestAdmin(updateParams.tun.enable);
@@ -712,6 +726,10 @@ class AppController {
 
   Future<void> setupClashConfig() {
     return _coreLifecycleLock.synchronized(() async {
+      if (system.isDesktop && !globalState.isStart) {
+        lastProfileModified = null;
+        return;
+      }
       await safeRun(() async {
         final configured = await _setupCoreConfig();
         if (configured) {
@@ -724,6 +742,12 @@ class AppController {
   Future<void> _applyProfile() async {
     _invalidateCoreReads();
     _ref.read(delayDataSourceProvider.notifier).value = {};
+    if (system.isDesktop && !globalState.isStart) {
+      lastProfileModified = null;
+      _ref.read(groupsProvider.notifier).value = [];
+      _ref.read(providersProvider.notifier).value = [];
+      return;
+    }
     unawaited(
       clashCore.requestGc().then<void>(
         (_) {},
@@ -757,6 +781,10 @@ class AppController {
 
   Future<void> handleChangeProfile({bool hardRestart = false}) {
     return _coreLifecycleLock.synchronized(() async {
+      if (system.isDesktop && !globalState.isStart) {
+        await _applyProfile();
+        return;
+      }
       if (hardRestart) {
         _ref.read(isRestartingCoreProvider.notifier).state = true;
         try {
@@ -1434,7 +1462,7 @@ class AppController {
         }
       }
     }
-    if (!globalState.isStart) {
+    if (!globalState.isStart && needRecovery) {
       await system.updateDns(true);
     }
     final hasProfile = _ref.read(currentProfileProvider) != null;

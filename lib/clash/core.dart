@@ -369,7 +369,9 @@ class ClashCore {
   }
 
   Future<void> startListener() async {
-    await clashInterface.startListener();
+    if (!await clashInterface.startListener()) {
+      throw StateError('Failed to start proxy listeners. Check the core logs.');
+    }
   }
 
   Future<void> stopListener() async {

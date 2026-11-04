@@ -28,8 +28,11 @@ import (
 	"github.com/metacubex/mihomo/component/updater"
 	"github.com/metacubex/mihomo/config"
 	"github.com/metacubex/mihomo/constant"
+	"github.com/metacubex/mihomo/constant/features"
 	cp "github.com/metacubex/mihomo/constant/provider"
+	"github.com/metacubex/mihomo/dns"
 	"github.com/metacubex/mihomo/hub/executor"
+	"github.com/metacubex/mihomo/hub/route"
 	"github.com/metacubex/mihomo/listener"
 	"github.com/metacubex/mihomo/log"
 	mihomoNtp "github.com/metacubex/mihomo/ntp/ntp"
@@ -88,17 +91,43 @@ func handleInitClash(paramsString string) bool {
 func handleStartListener() bool {
 	runLock.Lock()
 	defer runLock.Unlock()
+	if currentConfig == nil {
+		return false
+	}
 	isRunning = true
 	updateListeners()
+	if !features.Android {
+		ports := listener.GetPorts()
+		general := currentConfig.General
+		if (general.MixedPort != 0 && ports.MixedPort != general.MixedPort) ||
+			(general.Port != 0 && ports.Port != general.Port) ||
+			(general.SocksPort != 0 && ports.SocksPort != general.SocksPort) ||
+			(general.RedirPort != 0 && ports.RedirPort != general.RedirPort) ||
+			(general.TProxyPort != 0 && ports.TProxyPort != general.TProxyPort) {
+			log.Errorln("[APP] Failed to start proxy listeners")
+			stopRunningListeners()
+			return false
+		}
+	}
 	resolver.ResetConnection()
 	return true
+}
+
+func stopRunningListeners() {
+	isRunning = false
+	listener.StopListener()
+	if !features.Android {
+		listener.PatchInboundListeners(nil, tunnel.Tunnel, true)
+		listener.PatchTunnel(nil, tunnel.Tunnel)
+		dns.ReCreateServer("", nil, nil)
+		route.ReCreateServer(&route.Config{})
+	}
 }
 
 func handleStopListener() bool {
 	runLock.Lock()
 	defer runLock.Unlock()
-	isRunning = false
-	listener.StopListener()
+	stopRunningListeners()
 	return true
 }
 

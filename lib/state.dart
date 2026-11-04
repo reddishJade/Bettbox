@@ -445,7 +445,6 @@ class GlobalState {
     UpdateTasks? tasks,
     bool includeVpnService = true,
   ]) async {
-    startTime ??= DateTime.now();
     if (system.isAndroid && isService) {
       await clashLibHandler?.startListener();
     } else {
@@ -454,6 +453,7 @@ class GlobalState {
     if (includeVpnService) {
       await service?.startVpn();
     }
+    startTime ??= DateTime.now();
     final prefs = await preferences.sharedPreferencesCompleter.future;
     await prefs?.setBool('is_vpn_running', true);
 
