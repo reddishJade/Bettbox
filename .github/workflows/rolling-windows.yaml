@@ -1,0 +1,64 @@
+name: Windows rolling build
+
+on:
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  SENTRY_BACKEND: none
+  IPINFO_TOKEN: ${{ secrets.IPINFO_TOKEN || vars.IPINFO_TOKEN }}
+
+jobs:
+  build:
+    runs-on: windows-2022
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      - run: git config --global core.longpaths true
+      - uses: actions/setup-go@v6
+        with:
+          go-version: 1.25.x
+          cache-dependency-path: core/go.sum
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.7
+          cache: true
+      - name: Build core
+        shell: bash
+        run: |
+          flutter pub get
+          dart run build_runner build
+          dart setup.dart windows --arch amd64 --out core-only
+      - name: Build application
+        shell: pwsh
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: |
+          $coreHash = (Get-FileHash libclash/windows/BettboxCore.exe -Algorithm SHA256).Hash.ToLower()
+          $flutterArgs = @(
+            'build', 'windows', '--release',
+            "--dart-define=CORE_SHA256=$coreHash",
+            '--dart-define=APP_ENV=pre',
+            '--dart-define=APP_ASSET_SUFFIX=windows-amd64-setup.exe'
+          )
+          if ($env:SENTRY_DSN) { $flutterArgs += "--dart-define=SENTRY_DSN=$env:SENTRY_DSN" }
+          if ($env:IPINFO_TOKEN) { $flutterArgs += "--dart-define=IPINFO_TOKEN=$env:IPINFO_TOKEN" }
+          flutter @flutterArgs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Package installer and portable build
+        shell: bash
+        run: dart windows/packaging/exe/package_windows.dart --arch amd64 --portable --env pre
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Bettbox-windows-amd64-rolling
+          path: |
+            dist/*.exe
+            dist/*.zip
+          if-no-files-found: error
