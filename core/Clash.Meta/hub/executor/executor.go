@@ -82,6 +82,25 @@ func ParseWithBytes(buf []byte) (*config.Config, error) {
 
 // ApplyConfig dispatch configure to all parts without ExternalController
 func ApplyConfig(cfg *config.Config, force bool) {
+	applyConfig(cfg, true)
+}
+
+// ApplyConfigIdle loads proxies and providers without opening network listeners.
+func ApplyConfigIdle(cfg *config.Config) {
+	applyConfig(cfg, false)
+}
+
+// ActivateConfig starts the services intentionally deferred while idle.
+func ActivateConfig(cfg *config.Config) {
+	mux.Lock()
+	defer mux.Unlock()
+	updateDNS(cfg.DNS, cfg.General.IPv6)
+	updateNTP(cfg.NTP)
+	updateIPTables(cfg)
+	updateTunnels(cfg.Tunnels)
+}
+
+func applyConfig(cfg *config.Config, active bool) {
 	mux.Lock()
 	defer mux.Unlock()
 	log.SetLevel(cfg.General.LogLevel)
@@ -102,12 +121,16 @@ func ApplyConfig(cfg *config.Config, force bool) {
 	updateSniffer(cfg.Sniffer)
 	updateHosts(cfg.Hosts)
 	updateGeneral(cfg.General, true)
-	updateDNS(cfg.DNS, cfg.General.IPv6)
-	updateNTP(cfg.NTP) // initialize NTP after DNS because an NTP server may be a hostname.
-	// updateListeners(cfg.General, cfg.Listeners, force)
-	// updateTun(cfg.General) // tun should not care "force"
-	updateIPTables(cfg)
-	updateTunnels(cfg.Tunnels)
+	if active {
+		updateDNS(cfg.DNS, cfg.General.IPv6)
+		updateNTP(cfg.NTP)
+		updateIPTables(cfg)
+		updateTunnels(cfg.Tunnels)
+	} else {
+		dnsConfig := *cfg.DNS
+		dnsConfig.Listen = ""
+		updateDNS(&dnsConfig, cfg.General.IPv6)
+	}
 
 	tunnel.OnInnerLoading()
 

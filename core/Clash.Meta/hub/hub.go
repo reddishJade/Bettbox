@@ -57,6 +57,12 @@ func ApplyConfig(cfg *config.Config) {
 	executor.ApplyConfig(cfg, true)
 }
 
+// ActivateConfig starts network services after an idle configuration is applied.
+func ActivateConfig(cfg *config.Config) {
+	applyRoute(cfg)
+	executor.ActivateConfig(cfg)
+}
+
 func applyRoute(cfg *config.Config) {
 	if cfg.Controller.ExternalUI != "" {
 		route.SetUIPath(cfg.Controller.ExternalUI)

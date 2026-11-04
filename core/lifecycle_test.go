@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/metacubex/mihomo/constant"
+	"github.com/metacubex/mihomo/tunnel"
 )
 
 func availableTCPPort(t *testing.T) int {
@@ -87,7 +88,7 @@ func TestStopAndRestartReleasePorts(t *testing.T) {
 	for tunnelPort == proxyPort || tunnelPort == dnsPort || tunnelPort == controllerPort {
 		tunnelPort = availableTCPPort(t)
 	}
-	profile := fmt.Sprintf("mixed-port: %d\nexternal-controller: 127.0.0.1:%d\ndns:\n  enable: true\n  listen: 127.0.0.1:%d\n  nameserver: [1.1.1.1]\ntunnels:\n  - tcp,127.0.0.1:%d,example.com:80,DIRECT\nproxies: []\nproxy-groups: []\nrules: ['MATCH,DIRECT']\n", proxyPort, controllerPort, dnsPort, tunnelPort)
+	profile := fmt.Sprintf("mixed-port: %d\nexternal-controller: 127.0.0.1:%d\ndns:\n  enable: true\n  listen: 127.0.0.1:%d\n  nameserver: [1.1.1.1]\ntunnels:\n  - tcp,127.0.0.1:%d,example.com:80,DIRECT\nproxies: []\nproxy-providers:\n  Local:\n    type: inline\n    payload:\n      - {name: Example, type: ss, server: example.com, port: 443, cipher: aes-128-gcm, password: test}\nproxy-groups:\n  - {name: Main, type: select, use: [Local], proxies: [DIRECT]}\nrules: ['MATCH,DIRECT']\n", proxyPort, controllerPort, dnsPort, tunnelPort)
 	path := filepath.Join(home, "profile.yaml")
 	if err := os.WriteFile(path, []byte(profile), 0600); err != nil {
 		t.Fatal(err)
@@ -96,15 +97,24 @@ func TestStopAndRestartReleasePorts(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer handleStopListener()
+	if _, ok := tunnel.Proxies()["Main"]; !ok {
+		t.Fatal("idle configuration did not load proxy groups")
+	}
+	if _, ok := tunnel.Providers()["Local"]; !ok {
+		t.Fatal("idle configuration did not load proxy providers")
+	}
 	dnsAddr := fmt.Sprintf("127.0.0.1:%d", dnsPort)
 	controllerAddr := fmt.Sprintf("127.0.0.1:%d", controllerPort)
 	proxyAddr := fmt.Sprintf("127.0.0.1:%d", proxyPort)
 	tunnelAddr := fmt.Sprintf("127.0.0.1:%d", tunnelPort)
+	waitForTCP(t, tunnelAddr, false)
+	waitForTCP(t, dnsAddr, false)
+	waitForTCP(t, controllerAddr, false)
+	waitForTCP(t, proxyAddr, false)
+	handleStartListener()
 	waitForTCP(t, tunnelAddr, true)
 	waitForTCP(t, dnsAddr, true)
 	waitForTCP(t, controllerAddr, true)
-	waitForTCP(t, proxyAddr, false)
-	handleStartListener()
 	waitForTCP(t, proxyAddr, true)
 	handleStopListener()
 	waitForTCP(t, dnsAddr, false)
@@ -114,9 +124,12 @@ func TestStopAndRestartReleasePorts(t *testing.T) {
 	if _, err := setupConfig(&SetupParams{ProfilePath: path, TestURL: "https://example.com"}); err != nil {
 		t.Fatal(err)
 	}
+	waitForTCP(t, dnsAddr, false)
+	waitForTCP(t, controllerAddr, false)
+	waitForTCP(t, tunnelAddr, false)
+	handleStartListener()
 	waitForTCP(t, dnsAddr, true)
 	waitForTCP(t, controllerAddr, true)
 	waitForTCP(t, tunnelAddr, true)
-	handleStartListener()
 	waitForTCP(t, proxyAddr, true)
 }

@@ -31,9 +31,11 @@ import (
 	"github.com/metacubex/mihomo/constant/features"
 	cp "github.com/metacubex/mihomo/constant/provider"
 	"github.com/metacubex/mihomo/dns"
+	"github.com/metacubex/mihomo/hub"
 	"github.com/metacubex/mihomo/hub/executor"
 	"github.com/metacubex/mihomo/hub/route"
 	"github.com/metacubex/mihomo/listener"
+	"github.com/metacubex/mihomo/listener/tproxy"
 	"github.com/metacubex/mihomo/log"
 	mihomoNtp "github.com/metacubex/mihomo/ntp/ntp"
 	rulesProvider "github.com/metacubex/mihomo/rules/provider"
@@ -109,6 +111,9 @@ func handleStartListener() bool {
 			return false
 		}
 	}
+	if !features.Android {
+		hub.ActivateConfig(currentConfig)
+	}
 	resolver.ResetConnection()
 	return true
 }
@@ -120,6 +125,8 @@ func stopRunningListeners() {
 		listener.PatchInboundListeners(nil, tunnel.Tunnel, true)
 		listener.PatchTunnel(nil, tunnel.Tunnel)
 		dns.ReCreateServer("", nil, nil)
+		mihomoNtp.ReCreateNTPService("", 0, "", nil, false)
+		tproxy.CleanupTProxyIPTables()
 		route.ReCreateServer(&route.Config{})
 	}
 }

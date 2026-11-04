@@ -180,8 +180,8 @@ class AppController {
     }
     await _initCore();
 
-    final configured = setupConfig && (wasRunning || !system.isDesktop)
-        ? await _setupCoreConfig()
+    final configured = setupConfig
+        ? await _setupCoreConfig(starting: wasRunning)
         : false;
     if (refreshData && configured) {
       await updateGroups();
@@ -368,7 +368,10 @@ class AppController {
     return _checkIfNeedReapply();
   }
 
-  Future<bool> _setupCoreConfig({bool? enableTun}) async {
+  Future<bool> _setupCoreConfig({
+    bool? enableTun,
+    bool starting = false,
+  }) async {
     final currentProfile = _ref.read(currentProfileProvider);
     if (currentProfile == null) {
       return false;
@@ -381,7 +384,9 @@ class AppController {
     final patchConfig = _ref.read(patchClashConfigProvider);
     final targetTun = enableTun ?? patchConfig.tun.enable;
 
-    final realTunEnable = await _prepareTun(targetTun);
+    final realTunEnable = system.isDesktop && !globalState.isStart && !starting
+        ? targetTun
+        : await _prepareTun(targetTun);
     if (realTunEnable == null) return false;
 
     final realPatchConfig = patchConfig.copyWith.tun(enable: realTunEnable);
@@ -397,7 +402,10 @@ class AppController {
     _applyGlobalSelection(result.global);
     if (system.isDesktop) {
       final prefs = await preferences.sharedPreferencesCompleter.future;
-      await prefs?.setBool('is_tun_running', realTunEnable);
+      await prefs?.setBool(
+        'is_tun_running',
+        globalState.isStart && realTunEnable,
+      );
     }
     lastProfileModified = await _ref.read(
       currentProfileProvider.select((state) => state?.profileLastModified),
@@ -674,9 +682,13 @@ class AppController {
   }
 
   Future<void> _updateClashConfig() async {
-    if (system.isDesktop && !globalState.isStart) return;
     await _initCore();
     final updateParams = _ref.read(updateParamsProvider);
+    if (system.isDesktop && !globalState.isStart) {
+      final message = await clashCore.updateConfig(updateParams);
+      if (message.isNotEmpty) throw message;
+      return;
+    }
     final tunResult = await _requestAdmin(updateParams.tun.enable);
     if (tunResult.isError) return;
 
@@ -726,10 +738,6 @@ class AppController {
 
   Future<void> setupClashConfig() {
     return _coreLifecycleLock.synchronized(() async {
-      if (system.isDesktop && !globalState.isStart) {
-        lastProfileModified = null;
-        return;
-      }
       await safeRun(() async {
         final configured = await _setupCoreConfig();
         if (configured) {
@@ -742,12 +750,6 @@ class AppController {
   Future<void> _applyProfile() async {
     _invalidateCoreReads();
     _ref.read(delayDataSourceProvider.notifier).value = {};
-    if (system.isDesktop && !globalState.isStart) {
-      lastProfileModified = null;
-      _ref.read(groupsProvider.notifier).value = [];
-      _ref.read(providersProvider.notifier).value = [];
-      return;
-    }
     unawaited(
       clashCore.requestGc().then<void>(
         (_) {},
@@ -781,10 +783,6 @@ class AppController {
 
   Future<void> handleChangeProfile({bool hardRestart = false}) {
     return _coreLifecycleLock.synchronized(() async {
-      if (system.isDesktop && !globalState.isStart) {
-        await _applyProfile();
-        return;
-      }
       if (hardRestart) {
         _ref.read(isRestartingCoreProvider.notifier).state = true;
         try {

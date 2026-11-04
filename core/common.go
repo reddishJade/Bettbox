@@ -21,6 +21,7 @@ import (
 	"github.com/metacubex/mihomo/constant/features"
 	cp "github.com/metacubex/mihomo/constant/provider"
 	"github.com/metacubex/mihomo/hub"
+	"github.com/metacubex/mihomo/hub/executor"
 	"github.com/metacubex/mihomo/hub/route"
 	"github.com/metacubex/mihomo/listener"
 	"github.com/metacubex/mihomo/log"
@@ -228,7 +229,7 @@ func updateConfig(params *UpdateParams) {
 	needRecreateServer := params.ExternalController != nil ||
 		(params.LogLevel != nil && isDebug != wasDebug)
 
-	if needRecreateServer {
+	if isRunning && needRecreateServer {
 		route.ReCreateServer(&route.Config{
 			Addr:           currentConfig.Controller.ExternalController,
 			TLSAddr:        currentConfig.Controller.ExternalControllerTLS,
@@ -492,7 +493,11 @@ func setupConfig(params *SetupParams) (string, error) {
 	applyStart := time.Now()
 	currentConfig = prepared.cfg
 	currentRawConfig = prepared.rawCfg
-	hub.ApplyConfig(currentConfig)
+	if isRunning || features.Android {
+		hub.ApplyConfig(currentConfig)
+	} else {
+		executor.ApplyConfigIdle(currentConfig)
+	}
 	resetGroupShapes()
 	selectedMap := params.SelectedMap
 	if prepared.global != "" {
