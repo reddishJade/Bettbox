@@ -62,6 +62,7 @@ class TrackerInfoItem extends ConsumerWidget {
         4 +
         8 +
         measure.bodyLargeHeight +
+        measure.bodyMediumHeight +
         subTitleHeight +
         12 * 2;
   }
@@ -93,16 +94,15 @@ class TrackerInfoItem extends ConsumerWidget {
     final progress = trackerInfo.progressText.isNotEmpty
         ? '${trackerInfo.progressText} · '
         : '';
-    if (showSpeed) {
-      final upSpeed = TrafficValue(value: trackerInfo.uploadSpeed).toString();
-      final downSpeed = TrafficValue(
-        value: trackerInfo.downloadSpeed,
-      ).toString();
-      return '$progress$upSpeed/s↑ $downSpeed/s↓';
-    }
     final up = TrafficValue(value: trackerInfo.upload).toString();
     final down = TrafficValue(value: trackerInfo.download).toString();
-    return '$progress$up↑ $down↓';
+    final upSpeed = TrafficValue(
+      value: showSpeed ? trackerInfo.uploadSpeed : 0,
+    ).toString();
+    final downSpeed = TrafficValue(
+      value: showSpeed ? trackerInfo.downloadSpeed : 0,
+    ).toString();
+    return '$progress$up↑ $down↓\n$upSpeed/s↑ $downSpeed/s↓';
   }
 
   @override
@@ -142,7 +142,7 @@ class TrackerInfoItem extends ConsumerWidget {
         const SizedBox(height: 4),
         Text(
           _getSourceText(trackerInfo),
-          maxLines: 1,
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: context.textTheme.bodyMedium?.copyWith(
             fontSize: 12.5,

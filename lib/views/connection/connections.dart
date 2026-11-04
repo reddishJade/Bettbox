@@ -489,9 +489,6 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
     return Consumer(
       builder: (_, ref, _) {
         final connections = ref.watch(filteredConnectionsProvider);
-        final showSpeed =
-            ref.watch(connectionsSortProvider) !=
-            ConnectionsSortType.totalTraffic;
         return _buildList(
           count: connections.length,
           idOf: (index) => connections[index].id,
@@ -500,7 +497,7 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
             index: index,
             count: connections.length,
             closed: false,
-            showSpeed: showSpeed,
+            showSpeed: true,
             markClosed: false,
           ),
         );
@@ -553,9 +550,6 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
     return Consumer(
       builder: (_, ref, _) {
         final items = ref.watch(filteredAllConnectionsProvider);
-        final showSpeed =
-            ref.watch(connectionsSortProvider) !=
-            ConnectionsSortType.totalTraffic;
         return _buildList(
           count: items.length,
           idOf: (index) => items[index].info.id,
@@ -564,7 +558,7 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
             index: index,
             count: items.length,
             closed: items[index].closed,
-            showSpeed: showSpeed,
+            showSpeed: true,
             markClosed: true,
           ),
         );
