@@ -30,6 +30,12 @@ jobs:
           channel: stable
           flutter-version: 3.47.7
           cache: true
+      - name: Use hosted Linux plugin on Windows
+        shell: pwsh
+        run: |
+          $pubspec = Get-Content pubspec.yaml -Raw
+          $pubspec = $pubspec -replace '(?m)^  # Fix compile failure:.*\r?\n  hotkey_manager_linux:\r?\n    git:\r?\n      url: https://github.com/gepbird/hotkey_manager.git\r?\n      path: packages/hotkey_manager_linux\r?\n      ref: fix-build-failure\r?\n', ''
+          Set-Content pubspec.yaml $pubspec -NoNewline
       - name: Build core
         shell: bash
         run: |
