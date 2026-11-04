@@ -54,14 +54,6 @@ class Navigation {
         modes: [NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(Icons.terminal_outlined),
-        label: PageLabel.script,
-        description: 'scriptDesc',
-        builder: (_) =>
-            ScriptsView(key: const GlobalObjectKey(PageLabel.script)),
-        modes: [NavigationItemMode.more],
-      ),
-      NavigationItem(
         icon: const Icon(Icons.handyman_outlined),
         label: PageLabel.toolbox,
         description: 'toolboxDesc',

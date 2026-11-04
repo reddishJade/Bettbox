@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -22,7 +21,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as flutter_riverpod;
 import 'package:material_color_utilities/palettes/core_palette.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:synchronized/synchronized.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'common/common.dart';
@@ -79,7 +77,6 @@ class GlobalState {
   bool _needsTaskRestart = false;
   Timer? _backgroundCoreGcTimer;
   Timer? _backgroundCleanupTimer;
-  final Lock _scriptEvaluateLock = Lock();
   bool isInit = false;
 
   bool get hasMediaUnlockWidget {
@@ -738,7 +735,6 @@ class GlobalState {
     return params.copyWith(
       profilePath: await appPath.getProfilePath(targetProfile.id),
       ageSecretKey: targetProfile.ageSecretKey ?? '',
-      scriptedConfig: await _writeScriptedConfig(targetProfile),
       patch: await buildPatchParams(
         patchConfig: patchConfig,
         profile: targetProfile,
@@ -748,10 +744,7 @@ class GlobalState {
 
   Future<SetupParams?> buildValidateParams(Profile profile) async {
     final currentProfileId = config.currentProfileId;
-    final scriptActive =
-        config.scriptProps.currentScript != null && profile.useScriptOverride;
     if (isService ||
-        scriptActive ||
         (currentProfileId != null && currentProfileId != profile.id)) {
       return null;
     }
@@ -779,121 +772,6 @@ class GlobalState {
     return await clashCore.validateConfig(
       '',
       setup: await buildSetupParams(patchConfig: patchConfig),
-    );
-  }
-
-  Future<String> _writeScriptedConfig(Profile profile) async {
-    if (config.scriptProps.currentScript == null ||
-        !profile.useScriptOverride) {
-      return '';
-    }
-    final stamp = DateTime.now().microsecondsSinceEpoch;
-    final relayPath = await appPath.relayPath;
-    final separator = Platform.pathSeparator;
-    final file = File('$relayPath${separator}scripted-$stamp.json');
-    return _scriptEvaluateLock.synchronized(() async {
-      final currentScript = config.scriptProps.currentScript;
-      if (currentScript == null) return '';
-      unawaited(_sweepRelay(relayPath));
-      final cache = File('$relayPath${separator}cache-${profile.id}.json');
-      final cacheKey = File('$relayPath${separator}cache-${profile.id}.key');
-      String? content;
-      var digest = currentScript.digest;
-      var volatile = currentScript.volatile;
-      if (digest == null || volatile == null) {
-        content = await currentScript.readContent();
-        digest = content.toMd5();
-        volatile = volatileScriptPattern.hasMatch(content);
-      }
-      final key = volatile
-          ? null
-          : await _scriptedCacheKey(profile, currentScript, digest);
-      final exported = File('$relayPath${separator}profile-$stamp.json');
-      try {
-        if (key != null &&
-            await cache.exists() &&
-            await cacheKey.exists() &&
-            await cacheKey.readAsString() == key) {
-          await cache.copy(file.path);
-          return file.path;
-        }
-        await _exportProfileConfig(profile, exported.path);
-        await JavaScriptRuntimeManager.evaluateScriptFile(
-          scriptContent: content ?? await currentScript.readContent(),
-          inputPath: exported.path,
-          outputPath: file.path,
-          customOptions: currentScript.customOptions,
-        );
-        if (key != null) {
-          if (await cacheKey.exists()) {
-            await cacheKey.delete();
-          }
-          await file.copy(cache.path);
-          await cacheKey.writeAsString(key, flush: true);
-        }
-        return file.path;
-      } catch (e) {
-        commonPrint.error('Script execution failed: $e');
-        showNotifier('${appLocalizations.profileParseErrorDesc}: $e');
-        return '';
-      } finally {
-        if (await exported.exists()) {
-          try {
-            await exported.delete();
-          } catch (_) {}
-        }
-      }
-    });
-  }
-
-  Future<void> _sweepRelay(String relayPath) async {
-    final expire = DateTime.now().subtract(const Duration(minutes: 10));
-    try {
-      await for (final entity in Directory(relayPath).list()) {
-        if (entity is! File ||
-            entity.uri.pathSegments.last.startsWith('cache-') ||
-            (await entity.stat()).modified.isAfter(expire)) {
-          continue;
-        }
-        await entity.delete();
-      }
-    } catch (_) {}
-  }
-
-  Future<String?> _scriptedCacheKey(
-    Profile profile,
-    Script script,
-    String digest,
-  ) async {
-    final profileFile = File(await appPath.getProfilePath(profile.id));
-    if (!await profileFile.exists()) {
-      return null;
-    }
-    final stat = await profileFile.stat();
-    return [
-      packageInfo.version,
-      packageInfo.buildNumber,
-      stat.modified.microsecondsSinceEpoch,
-      stat.size,
-      profile.ageSecretKey ?? '',
-      digest,
-      json.encode(script.customOptions ?? const <String, bool>{}),
-    ].join('\n').toMd5();
-  }
-
-  Future<void> _exportProfileConfig(Profile profile, String output) async {
-    final handler = clashLibHandler;
-    if (handler != null) {
-      return handler.exportConfig(
-        profile.id,
-        output,
-        ageSecretKey: profile.ageSecretKey,
-      );
-    }
-    return clashCore.exportConfig(
-      profile.id,
-      output,
-      ageSecretKey: profile.ageSecretKey,
     );
   }
 
@@ -967,8 +845,6 @@ class GlobalState {
       'global-ua': patchConfig.globalUa,
     };
 
-    final scriptActive =
-        config.scriptProps.currentScript != null && profile.useScriptOverride;
     final overrideData = profile.overrideData;
     final isRussian =
         config.appSetting.locale?.toLowerCase().startsWith('ru') ?? false;
@@ -1025,30 +901,12 @@ class GlobalState {
               ? 'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((GEOSITE,geolocation-cn),(GEOIP,CN,no-resolve)))))),REJECT'
               : 'AND,((NETWORK,UDP),(DST-PORT,443)),REJECT',
       ],
-      'disabled-groups': scriptActive
-          ? const []
-          : [
-              for (final entry in profile.groupSwitches.entries)
-                if (!entry.value) entry.key,
-            ],
+      'disabled-groups': [
+        for (final entry in profile.groupSwitches.entries)
+          if (!entry.value) entry.key,
+      ],
       'select-global': profile.selectedMap['GLOBAL'] == null,
     };
-  }
-
-  Future<Map<String, dynamic>?> _readScriptedConfig(Profile profile) async {
-    final path = await _writeScriptedConfig(profile);
-    if (path.isEmpty) return null;
-    final file = File(path);
-    try {
-      final content = await file.readAsString();
-      return await Isolate.run(
-        () => Map<String, dynamic>.from(json.decode(content) as Map),
-      );
-    } finally {
-      if (await file.exists()) {
-        await file.delete();
-      }
-    }
   }
 
   Future<Map<String, dynamic>> getProfileConfig(
@@ -1056,10 +914,6 @@ class GlobalState {
     bool effective = false,
   }) async {
     final profile = config.profiles.getProfile(profileId);
-    if (effective && profile != null) {
-      final scripted = await _readScriptedConfig(profile);
-      if (scripted != null) return scripted;
-    }
     final ageSecretKey = profile?.ageSecretKey;
     final disabledGroups = effective && profile != null
         ? [

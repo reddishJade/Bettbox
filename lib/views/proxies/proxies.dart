@@ -1,7 +1,6 @@
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/common.dart';
-import 'package:bett_box/models/config.dart';
 import 'package:bett_box/models/widget.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
@@ -11,8 +10,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../profiles/scripts.dart'
-    show showGroupSwitchOptions, showScriptCustomOptions;
+import '../profiles/scripts.dart' show showGroupSwitchOptions;
 import 'advanced_settings.dart';
 import 'setting.dart';
 import 'tab.dart';
@@ -35,18 +33,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
         (state) => (state.autoStickyHeader, state.showHiddenItems),
       ),
     );
-    final (scriptOn, compatible) = ref.watch(
-      scriptStateProvider.select(
-        (s) => (s.currentId != null, s.currentScript?.compatible ?? false),
-      ),
-    );
-    final profileOverride = ref.watch(
-      currentProfileProvider.select((p) => p?.useScriptOverride ?? false),
-    );
-    final hasScriptCustom = scriptOn && compatible && profileOverride;
-    final hasGroupCustom =
-        !hasScriptCustom && ref.read(currentProfileIdProvider) != null;
-    final hasCustom = hasScriptCustom || hasGroupCustom;
+    final hasCustom = ref.watch(currentProfileIdProvider) != null;
     return [
       if (_isTab)
         IconButton(
@@ -185,13 +172,6 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   }
 
   Future<void> _handleCustomOptions() async {
-    final profileOverride =
-        ref.read(currentProfileProvider)?.useScriptOverride ?? false;
-    final script = ref.read(scriptStateProvider).currentScript;
-    if (script != null && script.compatible && profileOverride) {
-      await showScriptCustomOptions(context, script: script);
-      return;
-    }
     final profileId = ref.read(currentProfileIdProvider);
     if (profileId != null) {
       await showGroupSwitchOptions(context, profileId: profileId);

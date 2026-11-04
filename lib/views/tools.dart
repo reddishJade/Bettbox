@@ -21,7 +21,6 @@ import 'package:bett_box/views/config/tunnel.dart';
 import 'package:bett_box/views/connection/connections.dart';
 import 'package:bett_box/views/hotkey.dart';
 import 'package:bett_box/views/other_setting.dart';
-import 'package:bett_box/views/profiles/scripts.dart';
 import 'package:bett_box/views/resources.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
@@ -117,13 +116,7 @@ List<ToolsShortcut> getToolsShortcuts(
             builder: (_) => const ResourcesView(),
             wrap: false,
           ),
-          SidebarFlyoutEntry.script => ToolsShortcut(
-            icon: const Icon(Icons.terminal_outlined),
-            title: appLocalizations.script,
-            subtitle: appLocalizations.scriptDesc,
-            builder: (_) => const ScriptsView(),
-            wrap: false,
-          ),
+          SidebarFlyoutEntry.script => null,
           SidebarFlyoutEntry.toolbox => buildNavigationShortcut(
             PageLabel.toolbox,
           ),
