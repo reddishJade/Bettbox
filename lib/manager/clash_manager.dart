@@ -24,6 +24,7 @@ class _ClashContainerState extends ConsumerState<ClashManager>
     with AppMessageListener {
   final List<TrackerInfo> _pendingRequests = [];
   static const _flushDuration = Duration(milliseconds: 300);
+  DateTime? _lastProviderErrorNotice;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +98,17 @@ class _ClashContainerState extends ConsumerState<ClashManager>
   void onLog(Log log) {
     globalState.appController.addLog(log);
     if (log.logLevel == LogLevel.error) {
-      globalState.showNotifier(log.payload);
+      final isProviderInitializationError =
+          log.payload.startsWith('initial proxy provider ') ||
+          log.payload.startsWith('initial rule provider ');
+      final now = DateTime.now();
+      if (!isProviderInitializationError ||
+          _lastProviderErrorNotice == null ||
+          now.difference(_lastProviderErrorNotice!) >=
+              const Duration(seconds: 10)) {
+        globalState.showNotifier(log.payload);
+        if (isProviderInitializationError) _lastProviderErrorNotice = now;
+      }
     }
     super.onLog(log);
   }
