@@ -13,6 +13,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bett_box/providers/providers.dart';
 
+import 'quick_rule.dart';
+
 final _iconCache = <String, Uint8List?>{};
 final _iconPending = <String, Future<Uint8List?>>{};
 const _maxIconCacheSize = 100;
@@ -198,6 +200,66 @@ class TrackerInfoItem extends ConsumerWidget {
           )
         : null;
     final listItem = InkWell(
+      onSecondaryTapDown: (details) async {
+        final profile = ref.read(currentProfileProvider);
+        final candidates = connectionRuleCandidates(trackerInfo.metadata);
+        if (profile == null || candidates.isEmpty) return;
+        final overlay =
+            Overlay.of(context).context.findRenderObject() as RenderBox;
+        final position = RelativeRect.fromRect(
+          details.globalPosition & const Size(1, 1),
+          Offset.zero & overlay.size,
+        );
+        final candidate = await showMenu<({String type, String value})>(
+          context: context,
+          position: position,
+          items: [
+            PopupMenuItem(
+              enabled: false,
+              child: Text(appLocalizations.addRule),
+            ),
+            for (final candidate in candidates)
+              PopupMenuItem(
+                value: candidate,
+                child: Text('${candidate.type},${candidate.value}'),
+              ),
+          ],
+        );
+        if (candidate == null || !context.mounted) return;
+        final targets =
+            <String>{
+              'DIRECT',
+              'REJECT',
+              ...ref.read(groupsProvider).map((group) => group.name),
+            }.where(
+              (target) =>
+                  target.isNotEmpty && !RegExp(r'[,\r\n]').hasMatch(target),
+            );
+        final target = await showMenu<String>(
+          context: context,
+          position: position,
+          items: [
+            for (final target in targets)
+              PopupMenuItem(value: target, child: Text(target)),
+          ],
+        );
+        if (target == null ||
+            !context.mounted ||
+            ref.read(currentProfileProvider)?.id != profile.id) {
+          return;
+        }
+        final suffix = candidate.type.startsWith('IP-CIDR')
+            ? ',no-resolve'
+            : '';
+        final value = '${candidate.type},${candidate.value},$target$suffix';
+        ref
+            .read(profilesProvider.notifier)
+            .updateProfile(
+              profile.id,
+              (profile) => addConnectionOverride(profile, value),
+            );
+        globalState.appController.setupClashConfigDebounce();
+      },
       focusColor: context.colorScheme.primary.withValues(alpha: 0.18),
       onTap: () {
         showExtend(
