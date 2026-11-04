@@ -42,6 +42,12 @@ jobs:
           flutter pub get
           dart run build_runner build
           dart setup.dart windows --arch amd64 --out core-only
+      - name: Build helper service
+        shell: pwsh
+        run: |
+          $coreHash = (Get-FileHash libclash/windows/BettboxCore.exe -Algorithm SHA256).Hash.ToLower()
+          dart setup.dart windows --arch amd64 --out helper --core-hash $coreHash
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Build application
         shell: pwsh
         env:
