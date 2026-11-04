@@ -1100,6 +1100,16 @@ class AppLocalizations {
     return Intl.message('Edit', name: 'edit', desc: '', args: []);
   }
 
+  /// `Edit Info`
+  String get editInfo {
+    return Intl.message('Edit Info', name: 'editInfo', desc: '', args: []);
+  }
+
+  /// `Edit File`
+  String get editFile {
+    return Intl.message('Edit File', name: 'editFile', desc: '', args: []);
+  }
+
   /// `Confirm`
   String get confirm {
     return Intl.message('Confirm', name: 'confirm', desc: '', args: []);

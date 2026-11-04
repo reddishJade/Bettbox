@@ -679,6 +679,8 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "dualRing": MessageLookupByLibrary.simpleMessage("Двойное кольцо"),
     "edit": MessageLookupByLibrary.simpleMessage("Редактировать"),
+    "editFile": MessageLookupByLibrary.simpleMessage("Изменить файл"),
+    "editInfo": MessageLookupByLibrary.simpleMessage("Изменить сведения"),
     "editTunnel": MessageLookupByLibrary.simpleMessage(
       "Изменить перенаправление",
     ),

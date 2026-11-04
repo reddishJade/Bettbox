@@ -494,6 +494,8 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "dualRing": MessageLookupByLibrary.simpleMessage("雙環迴旋"),
     "edit": MessageLookupByLibrary.simpleMessage("編輯"),
+    "editFile": MessageLookupByLibrary.simpleMessage("編輯檔案"),
+    "editInfo": MessageLookupByLibrary.simpleMessage("編輯資訊"),
     "editTunnel": MessageLookupByLibrary.simpleMessage("編輯轉發"),
     "editUser": MessageLookupByLibrary.simpleMessage("編輯用戶"),
     "emptyTip": m11,

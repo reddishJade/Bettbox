@@ -662,6 +662,8 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "dualRing": MessageLookupByLibrary.simpleMessage("حلقه دوتایی"),
     "edit": MessageLookupByLibrary.simpleMessage("ویرایش"),
+    "editFile": MessageLookupByLibrary.simpleMessage("ویرایش فایل"),
+    "editInfo": MessageLookupByLibrary.simpleMessage("ویرایش اطلاعات"),
     "editTunnel": MessageLookupByLibrary.simpleMessage("ویرایش هدایت"),
     "editUser": MessageLookupByLibrary.simpleMessage("ویرایش کاربر"),
     "emptyTip": m11,

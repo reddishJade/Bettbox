@@ -122,6 +122,8 @@
   "application": "アプリケーション",
   "applicationDesc": "アプリ設定の変更",
   "edit": "編集",
+  "editInfo": "情報を編集",
+  "editFile": "ファイルを編集",
   "confirm": "確定",
   "update": "更新",
   "add": "追加",

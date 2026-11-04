@@ -122,6 +122,8 @@
   "application": "应用程序",
   "applicationDesc": "修改应用程序设置",
   "edit": "编辑",
+  "editInfo": "编辑信息",
+  "editFile": "编辑文件",
   "confirm": "确定",
   "update": "更新",
   "add": "添加",

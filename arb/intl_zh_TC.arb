@@ -122,6 +122,8 @@
   "application": "應用程式",
   "applicationDesc": "修改應用程式設定",
   "edit": "編輯",
+  "editInfo": "編輯資訊",
+  "editFile": "編輯檔案",
   "confirm": "確定",
   "update": "更新",
   "add": "新增",

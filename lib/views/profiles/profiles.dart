@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
@@ -298,6 +300,54 @@ class ProfileItem extends StatelessWidget {
     }
   }
 
+  Future<void> _handleEditFile(BuildContext context) async {
+    final content = await globalState.appController.safeRun<String>(
+      () async => (await profile.getFile()).readAsString(),
+      silence: false,
+    );
+    if (content == null || !context.mounted) return;
+    final title = profile.label ?? profile.id;
+
+    Future<void> save(BuildContext editorContext, String data) async {
+      var updated = profile;
+      if (updated.type == ProfileType.url && updated.autoUpdate) {
+        final disable = await globalState.showMessage(
+          title: appLocalizations.tip,
+          message: TextSpan(text: appLocalizations.profileHasUpdate),
+        );
+        if (disable == true) updated = updated.copyWith(autoUpdate: false);
+      }
+      final saved = await globalState.appController.safeRun<Profile>(
+        () => updated.saveFile(utf8.encode(data)),
+        silence: false,
+      );
+      if (saved == null) return;
+      globalState.appController.setProfileAndAutoApply(saved);
+      if (editorContext.mounted) Navigator.of(editorContext).pop();
+    }
+
+    await BaseNavigator.push(
+      context,
+      EditorPage(
+        title: title,
+        content: content,
+        onSave: (editorContext, _, data) => save(editorContext, data),
+        onPop: (editorContext, _, data) async {
+          if (data == content) return true;
+          final saveChanges = await globalState.showMessage(
+            title: title,
+            message: TextSpan(text: appLocalizations.hasCacheChange),
+          );
+          if (saveChanges == true && editorContext.mounted) {
+            await save(editorContext, data);
+            return false;
+          }
+          return true;
+        },
+      ),
+    );
+  }
+
   void _handleShowEditExtendPage(BuildContext context) {
     final editKey = GlobalKey<EditProfileViewState>();
     showExtend(
@@ -319,7 +369,7 @@ class ProfileItem extends StatelessWidget {
             profile: profile,
             context: context,
           ),
-          title: appLocalizations.edit,
+          title: appLocalizations.editInfo,
         );
       },
     );
@@ -500,10 +550,15 @@ class ProfileItem extends StatelessWidget {
     return [
       PopupMenuItemData(
         icon: Icons.edit_outlined,
-        label: appLocalizations.edit,
+        label: appLocalizations.editInfo,
         onPressed: () {
           _handleShowEditExtendPage(context);
         },
+      ),
+      PopupMenuItemData(
+        icon: Icons.code,
+        label: appLocalizations.editFile,
+        onPressed: () => _handleEditFile(context),
       ),
       if (profile.type == ProfileType.url) ...[
         PopupMenuItemData(

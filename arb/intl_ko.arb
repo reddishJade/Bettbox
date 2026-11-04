@@ -122,6 +122,8 @@
   "application": "애플리케이션",
   "applicationDesc": "앱 설정 변경",
   "edit": "편집",
+  "editInfo": "정보 편집",
+  "editFile": "파일 편집",
   "confirm": "확인",
   "update": "업데이트",
   "add": "추가",

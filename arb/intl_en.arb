@@ -122,6 +122,8 @@
   "application": "Application",
   "applicationDesc": "Modify application settings",
   "edit": "Edit",
+  "editInfo": "Edit Info",
+  "editFile": "Edit File",
   "confirm": "Confirm",
   "update": "Update",
   "add": "Add",

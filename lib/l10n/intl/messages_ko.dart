@@ -556,6 +556,8 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "dualRing": MessageLookupByLibrary.simpleMessage("듀얼 링"),
     "edit": MessageLookupByLibrary.simpleMessage("편집"),
+    "editFile": MessageLookupByLibrary.simpleMessage("파일 편집"),
+    "editInfo": MessageLookupByLibrary.simpleMessage("정보 편집"),
     "editTunnel": MessageLookupByLibrary.simpleMessage("포워딩 편집"),
     "editUser": MessageLookupByLibrary.simpleMessage("사용자 편집"),
     "emptyTip": m11,

@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
-import 'package:bett_box/pages/editor.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
@@ -37,7 +35,6 @@ class EditProfileViewState extends State<EditProfileView> {
   late TextEditingController ageSecretKeyController;
   FocusNode? urlFocusNode;
   bool _obscureAgeSecretKey = true;
-  String? rawText;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final fileInfoNotifier = ValueNotifier<FileInfo?>(null);
   Uint8List? fileData;
@@ -176,78 +173,6 @@ class EditProfileViewState extends State<EditProfileView> {
     return FileInfo(size: size, lastModified: lastModified);
   }
 
-  Future<void> _handleSaveEdit(BuildContext context, String data) async {
-    final message = await globalState.appController.safeRun<String>(() async {
-      final originalMessage = await clashCore.validateConfig(
-        data,
-        ageSecretKey: ageSecretKeyController.text.trim(),
-      );
-      if (originalMessage.isEmpty) return '';
-      final patched = utils.patchValidateConfig(data);
-      if (patched == data) return originalMessage;
-      final patchedMessage = await clashCore.validateConfig(
-        patched,
-        ageSecretKey: ageSecretKeyController.text.trim(),
-      );
-      return patchedMessage.isEmpty ? '' : originalMessage;
-    }, silence: false);
-    if (message?.isNotEmpty == true) {
-      globalState.showMessage(
-        title: appLocalizations.tip,
-        message: TextSpan(text: message),
-        cancelable: false,
-      );
-      return;
-    }
-    if (context.mounted) {
-      Navigator.of(context).pop(utils.patchValidateConfig(data));
-    }
-  }
-
-  Future<void> _editProfileFile() async {
-    if (rawText == null) {
-      final profilePath = await appPath.getProfilePath(widget.profile.id);
-      final file = File(profilePath);
-      if (await file.exists()) {
-        rawText = await file.readAsString();
-      }
-    }
-    if (!mounted) return;
-    final title = widget.profile.label ?? widget.profile.id;
-    final editorPage = EditorPage(
-      title: title,
-      content: rawText!,
-      onSave: (context, _, content) {
-        _handleSaveEdit(context, content);
-      },
-      onPop: (context, _, content) async {
-        if (content == rawText) {
-          return true;
-        }
-        final res = await globalState.showMessage(
-          title: title,
-          message: TextSpan(text: appLocalizations.hasCacheChange),
-        );
-        if (res == true && context.mounted) {
-          _handleSaveEdit(context, content);
-        } else {
-          return true;
-        }
-        return false;
-      },
-    );
-    final data = await BaseNavigator.push<String>(context, editorPage);
-    if (data == null) {
-      return;
-    }
-    rawText = data;
-    fileData = Uint8List.fromList(utf8.encode(data));
-    fileInfoNotifier.value = fileInfoNotifier.value?.copyWith(
-      size: fileData?.length ?? 0,
-      lastModified: DateTime.now(),
-    );
-  }
-
   Future<void> _uploadProfileFile() async {
     final platformFile = await globalState.appController.safeRun(
       picker.pickerFile,
@@ -322,40 +247,40 @@ class EditProfileViewState extends State<EditProfileView> {
             },
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: TextFormField(
-            textInputAction: TextInputAction.next,
-            controller: ageSecretKeyController,
-            obscureText: _obscureAgeSecretKey,
-            maxLines: 1,
-            minLines: 1,
-            decoration: InputDecoration(
-              labelText: appLocalizations.ageSecretKeyOptional,
-              hintText: 'AGE-SECRET-KEY-...',
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureAgeSecretKey
-                      ? Icons.visibility
-                      : Icons.visibility_off,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscureAgeSecretKey = !_obscureAgeSecretKey;
-                  });
-                },
+      ],
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: TextFormField(
+          textInputAction: TextInputAction.next,
+          controller: ageSecretKeyController,
+          obscureText: _obscureAgeSecretKey,
+          maxLines: 1,
+          minLines: 1,
+          decoration: InputDecoration(
+            labelText: appLocalizations.ageSecretKeyOptional,
+            hintText: 'AGE-SECRET-KEY-...',
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureAgeSecretKey ? Icons.visibility : Icons.visibility_off,
               ),
+              onPressed: () {
+                setState(() {
+                  _obscureAgeSecretKey = !_obscureAgeSecretKey;
+                });
+              },
             ),
-            validator: (String? value) {
-              if (value != null && value.isNotEmpty) {
-                if (!value.startsWith('AGE-SECRET-KEY-')) {
-                  return appLocalizations.ageSecretKeyInvalidValidationDesc;
-                }
-              }
-              return null;
-            },
           ),
+          validator: (String? value) {
+            if (value != null && value.isNotEmpty) {
+              if (!value.startsWith('AGE-SECRET-KEY-')) {
+                return appLocalizations.ageSecretKeyInvalidValidationDesc;
+              }
+            }
+            return null;
+          },
         ),
+      ),
+      if (widget.profile.type == ProfileType.url || widget.isNew) ...[
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: CommonCard(
@@ -419,11 +344,6 @@ class EditProfileViewState extends State<EditProfileView> {
                                 runSpacing: 6,
                                 spacing: 12,
                                 children: [
-                                  CommonChip(
-                                    avatar: const Icon(Icons.edit),
-                                    label: appLocalizations.edit,
-                                    onPressed: _editProfileFile,
-                                  ),
                                   CommonChip(
                                     avatar: const Icon(Icons.upload),
                                     label: appLocalizations.upload,

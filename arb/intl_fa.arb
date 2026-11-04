@@ -122,6 +122,8 @@
   "application": "برنامه",
   "applicationDesc": "مدیریت تنظیمات برنامه",
   "edit": "ویرایش",
+  "editInfo": "ویرایش اطلاعات",
+  "editFile": "ویرایش فایل",
   "confirm": "تایید",
   "update": "بروزرسانی",
   "add": "افزودن",

@@ -544,6 +544,8 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "dualRing": MessageLookupByLibrary.simpleMessage("デュアルリング"),
     "edit": MessageLookupByLibrary.simpleMessage("編集"),
+    "editFile": MessageLookupByLibrary.simpleMessage("ファイルを編集"),
+    "editInfo": MessageLookupByLibrary.simpleMessage("情報を編集"),
     "editTunnel": MessageLookupByLibrary.simpleMessage("転送編集"),
     "editUser": MessageLookupByLibrary.simpleMessage("ユーザーを編集"),
     "emptyTip": m11,
