@@ -601,8 +601,14 @@ enum SidebarFlyoutEntry {
   application,
   about;
 
-  static List<SidebarFlyoutEntry> get supportedValues =>
-      values.where((entry) => entry != script && (entry != loopback || system.isWindows)).toList();
+  static List<SidebarFlyoutEntry> get supportedValues => values
+      .where(
+        (entry) =>
+            entry != script &&
+            entry != resources &&
+            (entry != loopback || system.isWindows),
+      )
+      .toList();
 
   String get localizedName => switch (this) {
     SidebarFlyoutEntry.resources => appLocalizations.resources,

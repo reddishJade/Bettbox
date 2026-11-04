@@ -38,20 +38,20 @@ class Navigation {
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
+        icon: const Icon(Icons.storage),
+        label: PageLabel.resources,
+        description: 'resourcesDesc',
+        builder: (_) =>
+            ResourcesView(key: const GlobalObjectKey(PageLabel.resources)),
+        modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
+      ),
+      NavigationItem(
         icon: Icon(Icons.cable_rounded),
         label: PageLabel.connections,
         builder: (_) =>
             ConnectionsView(key: const GlobalObjectKey(PageLabel.connections)),
         description: 'connectionsDesc',
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
-      ),
-      NavigationItem(
-        icon: const Icon(Icons.storage),
-        label: PageLabel.resources,
-        description: 'resourcesDesc',
-        builder: (_) =>
-            ResourcesView(key: const GlobalObjectKey(PageLabel.resources)),
-        modes: [NavigationItemMode.more],
       ),
       NavigationItem(
         icon: const Icon(Icons.handyman_outlined),

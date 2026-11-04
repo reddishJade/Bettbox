@@ -114,7 +114,6 @@ List<DashboardWidget> desktopDashboardWidgetsSafeFromJson(
 }
 
 const List<SidebarFlyoutEntry> defaultSidebarFlyoutEntries = [
-  SidebarFlyoutEntry.resources,
   SidebarFlyoutEntry.toolbox,
   SidebarFlyoutEntry.theme,
   SidebarFlyoutEntry.basicConfig,

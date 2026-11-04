@@ -124,6 +124,7 @@ NavigationItemsState currentNavigationItemsState(Ref ref) {
             PageLabel.dashboard,
             PageLabel.proxies,
             PageLabel.profiles,
+            PageLabel.resources,
             PageLabel.tools,
           ].contains(element.label),
         )
