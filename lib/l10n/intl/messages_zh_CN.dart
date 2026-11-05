@@ -1469,6 +1469,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "systemProxy": MessageLookupByLibrary.simpleMessage("系统代理"),
     "systemProxyDesc": MessageLookupByLibrary.simpleMessage("设置系统代理"),
     "tab": MessageLookupByLibrary.simpleMessage("标签页"),
+    "taskbarTraffic": MessageLookupByLibrary.simpleMessage("任务栏网速"),
+    "taskbarTrafficDesc": MessageLookupByLibrary.simpleMessage(
+      "在 Windows 任务栏显示 Bettbox 的上传和下载速率",
+    ),
+    "taskbarTrafficMissing": MessageLookupByLibrary.simpleMessage(
+      "无法启动 Taskbar Traffic，请确认已安装该组件",
+    ),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP并发"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage("开启后允许 TCP 并发连接"),
     "testUrl": MessageLookupByLibrary.simpleMessage("测试链接"),

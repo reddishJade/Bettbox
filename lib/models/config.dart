@@ -334,6 +334,7 @@ abstract class VpnProps with _$VpnProps {
     @Default(TrayClickBehavior.showMenu)
     TrayClickBehavior trayRightClickBehavior,
     @Default(false) bool enableTraySpeed,
+    @Default(false) bool enableTaskbarTraffic,
     @Default(true) bool alwaysShowTitleBar,
     @Default(true) bool quickResponse,
     @Default(defaultAccessControl) AccessControl accessControl,

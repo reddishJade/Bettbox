@@ -676,6 +676,9 @@ class TraySection extends ConsumerWidget {
     final enableTraySpeed = ref.watch(
       vpnSettingProvider.select((state) => state.enableTraySpeed),
     );
+    final enableTaskbarTraffic = ref.watch(
+      vpnSettingProvider.select((state) => state.enableTaskbarTraffic),
+    );
 
     final showClickBehaviorSetting = system.isMacOS;
 
@@ -713,6 +716,46 @@ class TraySection extends ConsumerWidget {
             },
           ),
         ),
+        if (system.isWindows) ...[
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: context.colorScheme.outlineVariant.withValues(
+              alpha: context.colorScheme.brightness == Brightness.light
+                  ? 0.6
+                  : 0.45,
+            ),
+            indent: 16,
+            endIndent: 16,
+          ),
+          ListItem.switchItem(
+            title: Text(appLocalizations.taskbarTraffic),
+            subtitle: Text(appLocalizations.taskbarTrafficDesc),
+            delegate: SwitchDelegate(
+              value: enableTaskbarTraffic,
+              onChanged: (bool value) async {
+                if (value && !await taskbarTraffic.setEnabled(true)) {
+                  globalState.showNotifier(
+                    appLocalizations.taskbarTrafficMissing,
+                  );
+                  return;
+                }
+                if (!context.mounted) {
+                  if (value) await taskbarTraffic.setEnabled(false);
+                  return;
+                }
+                if (!value) await taskbarTraffic.setEnabled(false);
+                if (!context.mounted) return;
+                ref
+                    .read(vpnSettingProvider.notifier)
+                    .updateState(
+                      (state) => state.copyWith(enableTaskbarTraffic: value),
+                    );
+                await globalState.appController.updateTray();
+              },
+            ),
+          ),
+        ],
         if (system.isMacOS) ...[
           Divider(
             height: 1,

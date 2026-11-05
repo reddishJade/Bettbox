@@ -2021,6 +2021,15 @@ class MessageLookup extends MessageLookupByLibrary {
       "تنظیمات پروکسی سیستم",
     ),
     "tab": MessageLookupByLibrary.simpleMessage("زبانه"),
+    "taskbarTraffic": MessageLookupByLibrary.simpleMessage(
+      "سرعت در نوار وظیفه",
+    ),
+    "taskbarTrafficDesc": MessageLookupByLibrary.simpleMessage(
+      "نمایش سرعت بارگذاری و دریافت Bettbox در نوار وظیفه ویندوز",
+    ),
+    "taskbarTrafficMissing": MessageLookupByLibrary.simpleMessage(
+      "Taskbar Traffic اجرا نشد. مطمئن شوید مؤلفه نصب شده است.",
+    ),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("اتصال همزمان TCP"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage(
       "اجازه به اتصال‌های همزمان TCP",

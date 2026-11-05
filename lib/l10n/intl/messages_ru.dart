@@ -2066,6 +2066,15 @@ class MessageLookup extends MessageLookupByLibrary {
       "Настроить системный прокси",
     ),
     "tab": MessageLookupByLibrary.simpleMessage("Вкладки"),
+    "taskbarTraffic": MessageLookupByLibrary.simpleMessage(
+      "Скорость на панели задач",
+    ),
+    "taskbarTrafficDesc": MessageLookupByLibrary.simpleMessage(
+      "Показывать скорость Bettbox на панели задач Windows",
+    ),
+    "taskbarTrafficMissing": MessageLookupByLibrary.simpleMessage(
+      "Не удалось запустить Taskbar Traffic. Убедитесь, что компонент установлен.",
+    ),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage(
       "Параллельные TCP-соединения",
     ),

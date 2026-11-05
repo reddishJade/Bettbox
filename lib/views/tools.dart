@@ -791,6 +791,17 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         ),
       if (system.isWindows)
         _SearchItem(
+          title: appLocalizations.taskbarTraffic,
+          subtitle: appLocalizations.taskbarTrafficDesc,
+          category: otherSettingsCategory,
+          onTap: (context, _) => _pushPage(
+            context,
+            appLocalizations.otherSettings,
+            const OtherSettingView(),
+          ),
+        ),
+      if (system.isWindows)
+        _SearchItem(
           title: appLocalizations.highPriority,
           subtitle: appLocalizations.highPriorityDesc,
           category: otherSettingsCategory,

@@ -239,6 +239,7 @@ TrayState trayState(Ref ref) {
     wakelockEnabled: wakelockEnabled,
     trayEnhancement: vpnProps.trayEnhancement,
     enableTraySpeed: vpnProps.enableTraySpeed,
+    enableTaskbarTraffic: vpnProps.enableTaskbarTraffic,
   );
 }
 

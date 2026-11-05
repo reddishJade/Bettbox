@@ -665,6 +665,36 @@ class AppLocalizations {
     );
   }
 
+  /// `Taskbar traffic`
+  String get taskbarTraffic {
+    return Intl.message(
+      'Taskbar traffic',
+      name: 'taskbarTraffic',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show Bettbox upload and download rates on the Windows taskbar`
+  String get taskbarTrafficDesc {
+    return Intl.message(
+      'Show Bettbox upload and download rates on the Windows taskbar',
+      name: 'taskbarTrafficDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not start Taskbar Traffic. Make sure the component is installed.`
+  String get taskbarTrafficMissing {
+    return Intl.message(
+      'Could not start Taskbar Traffic. Make sure the component is installed.',
+      name: 'taskbarTrafficMissing',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Exclude China`
   String get excludeChina {
     return Intl.message(

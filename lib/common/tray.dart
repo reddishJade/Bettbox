@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
+import 'package:bett_box/providers/config.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/views/proxies/common.dart';
 import 'package:material_ui/material_ui.dart';
@@ -138,6 +139,20 @@ class Tray {
       }
       if (system.isMacOS) {
         await _syncSpeedTitle(isStart: trayState.isStart);
+      }
+      if (system.isWindows) {
+        final enabled = await taskbarTraffic.setEnabled(
+          trayState.enableTaskbarTraffic,
+        );
+        if (trayState.enableTaskbarTraffic && !enabled) {
+          globalState.appController.ref
+              .read(vpnSettingProvider.notifier)
+              .updateState(
+                (state) => state.copyWith(enableTaskbarTraffic: false),
+              );
+          globalState.showNotifier(appLocalizations.taskbarTrafficMissing);
+        }
+        if (!trayState.isStart) taskbarTraffic.update(0, 0);
       }
       List<MenuItem> menuItems = [];
       final showMenuItem = MenuItem(
