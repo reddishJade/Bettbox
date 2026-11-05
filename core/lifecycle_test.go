@@ -38,6 +38,32 @@ func waitForTCP(t *testing.T, addr string, open bool) {
 	t.Fatalf("TCP %s did not reach open=%v", addr, open)
 }
 
+func TestStartingWithFakeIPDoesNotDeadlock(t *testing.T) {
+	previousHome := constant.Path.HomeDir()
+	home := t.TempDir()
+	constant.SetHomeDir(home)
+	defer constant.SetHomeDir(previousHome)
+	path := filepath.Join(home, "profile.yaml")
+	profile := "mixed-port: 0\ndns:\n  enable: true\n  enhanced-mode: fake-ip\n  fake-ip-range: 198.18.0.1/16\n  nameserver: [1.1.1.1]\nproxies: []\nproxy-groups: []\nrules: ['MATCH,DIRECT']\n"
+	if err := os.WriteFile(path, []byte(profile), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := setupConfig(&SetupParams{ProfilePath: path, TestURL: "https://example.com"}); err != nil {
+		t.Fatal(err)
+	}
+	done := make(chan bool, 1)
+	go func() { done <- handleStartListener() }()
+	select {
+	case started := <-done:
+		if !started {
+			t.Fatal("start failed")
+		}
+		handleStopListener()
+	case <-time.After(2 * time.Second):
+		t.Fatal("starting fake-IP DNS deadlocked")
+	}
+}
+
 func TestStartFailsWhenProxyPortIsOccupied(t *testing.T) {
 	previousHome := constant.Path.HomeDir()
 	home := t.TempDir()
