@@ -235,7 +235,6 @@ class AppController {
     if (isDesktop && patchConfig.tun.enable) {
       final configured = await _quickSetupConfig(enableTun: false);
       if (configured != true) {
-        await clashCore.stopListener();
         return;
       }
 
@@ -295,7 +294,6 @@ class AppController {
       final setupResult = await _quickSetupConfig();
       if (setupResult != true) {
         commonPrint.error('Fast start aborted: setupConfig failed');
-        await clashCore.stopListener();
         return;
       }
     }
