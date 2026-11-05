@@ -1647,6 +1647,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "systemProxy": MessageLookupByLibrary.simpleMessage("システムプロキシ"),
     "systemProxyDesc": MessageLookupByLibrary.simpleMessage("システムプロキシの設定"),
     "tab": MessageLookupByLibrary.simpleMessage("タブ"),
+    "taskbarTraffic": MessageLookupByLibrary.simpleMessage("タスクバーの通信速度"),
+    "taskbarTrafficDesc": MessageLookupByLibrary.simpleMessage(
+      "Windows タスクバーに Bettbox の送受信速度を表示",
+    ),
+    "taskbarTrafficMissing": MessageLookupByLibrary.simpleMessage(
+      "Taskbar Traffic を起動できません。コンポーネントがインストールされているか確認してください",
+    ),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP並列接続"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage("TCPの同時並列接続を許可"),
     "testUrl": MessageLookupByLibrary.simpleMessage("テストURL"),

@@ -1992,6 +1992,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "systemProxy": MessageLookupByLibrary.simpleMessage("System Proxy"),
     "systemProxyDesc": MessageLookupByLibrary.simpleMessage("Set system proxy"),
     "tab": MessageLookupByLibrary.simpleMessage("Tab"),
+    "taskbarTraffic": MessageLookupByLibrary.simpleMessage("Taskbar traffic"),
+    "taskbarTrafficDesc": MessageLookupByLibrary.simpleMessage(
+      "Show Bettbox upload and download rates on the Windows taskbar",
+    ),
+    "taskbarTrafficMissing": MessageLookupByLibrary.simpleMessage(
+      "Could not start Taskbar Traffic. Make sure the component is installed.",
+    ),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP Concurrent"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage(
       "Allow concurrent TCP connections",

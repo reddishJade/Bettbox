@@ -463,12 +463,15 @@ class AppController {
         _ref.read(vpnSettingProvider).networkSpeedNotification;
     final enableTraySpeed =
         system.isMacOS && _ref.read(vpnSettingProvider).enableTraySpeed;
+    final enableTaskbarTraffic =
+        system.isWindows && _ref.read(vpnSettingProvider).enableTaskbarTraffic;
 
     final isScreenOn = globalState.isScreenOn;
 
     if (!shouldUpdateDashboard &&
         !(networkSpeedNotification && isScreenOn) &&
-        !enableTraySpeed) {
+        !enableTraySpeed &&
+        !enableTaskbarTraffic) {
       return;
     }
 
@@ -483,6 +486,9 @@ class AppController {
 
     if (enableTraySpeed) {
       await tray.updateSpeed(traffic);
+    }
+    if (enableTaskbarTraffic) {
+      taskbarTraffic.update(traffic.up.value, traffic.down.value);
     }
 
     if (networkSpeedNotification && isScreenOn) {
@@ -1140,6 +1146,13 @@ class AppController {
     globalState.isExiting = true;
 
     try {
+      if (system.isWindows) {
+        try {
+          await taskbarTraffic.setEnabled(false);
+        } catch (error) {
+          commonPrint.warn('Could not stop taskbar traffic: $error');
+        }
+      }
       if (system.isDesktop) {
         try {
           await trayManager.destroy();

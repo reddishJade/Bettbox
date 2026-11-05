@@ -405,6 +405,7 @@ _VpnProps _$VpnPropsFromJson(Map<String, dynamic> json) => _VpnProps(
       ) ??
       TrayClickBehavior.showMenu,
   enableTraySpeed: json['enableTraySpeed'] as bool? ?? false,
+  enableTaskbarTraffic: json['enableTaskbarTraffic'] as bool? ?? false,
   alwaysShowTitleBar: json['alwaysShowTitleBar'] as bool? ?? true,
   quickResponse: json['quickResponse'] as bool? ?? true,
   accessControl: json['accessControl'] == null
@@ -433,6 +434,7 @@ Map<String, dynamic> _$VpnPropsToJson(_VpnProps instance) => <String, dynamic>{
   'trayRightClickBehavior':
       _$TrayClickBehaviorEnumMap[instance.trayRightClickBehavior]!,
   'enableTraySpeed': instance.enableTraySpeed,
+  'enableTaskbarTraffic': instance.enableTaskbarTraffic,
   'alwaysShowTitleBar': instance.alwaysShowTitleBar,
   'quickResponse': instance.quickResponse,
   'accessControl': instance.accessControl,

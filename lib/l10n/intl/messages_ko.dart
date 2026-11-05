@@ -1643,6 +1643,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "systemProxy": MessageLookupByLibrary.simpleMessage("시스템 프록시"),
     "systemProxyDesc": MessageLookupByLibrary.simpleMessage("시스템 프록시 설정"),
     "tab": MessageLookupByLibrary.simpleMessage("탭"),
+    "taskbarTraffic": MessageLookupByLibrary.simpleMessage("작업 표시줄 속도"),
+    "taskbarTrafficDesc": MessageLookupByLibrary.simpleMessage(
+      "Windows 작업 표시줄에 Bettbox의 업로드 및 다운로드 속도 표시",
+    ),
+    "taskbarTrafficMissing": MessageLookupByLibrary.simpleMessage(
+      "Taskbar Traffic을 시작할 수 없습니다. 구성 요소가 설치되어 있는지 확인하세요",
+    ),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP 동시 연결"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage(
       "TCP 동시 다중 연결 허용",

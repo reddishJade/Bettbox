@@ -1914,7 +1914,7 @@ as String?,
 /// @nodoc
 mixin _$TrayState {
 
- Mode get mode; int get port; bool get autoLaunch; bool get systemProxy; bool get tunEnable; bool get isStart; String? get locale; Brightness? get brightness; List<Group> get groups; SelectedMap get selectedMap; bool get wakelockEnabled; Map<String, int?> get delays; bool get trayEnhancement; bool get enableTraySpeed;
+ Mode get mode; int get port; bool get autoLaunch; bool get systemProxy; bool get tunEnable; bool get isStart; String? get locale; Brightness? get brightness; List<Group> get groups; SelectedMap get selectedMap; bool get wakelockEnabled; Map<String, int?> get delays; bool get trayEnhancement; bool get enableTraySpeed; bool get enableTaskbarTraffic;
 /// Create a copy of TrayState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1926,20 +1926,20 @@ $TrayStateCopyWith<TrayState> get copyWith => _$TrayStateCopyWithImpl<TrayState>
 @override
 bool operator ==(Object other) {
   final _this = this as TrayState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TrayState&&(identical(other.mode, _this.mode) || other.mode == _this.mode)&&(identical(other.port, _this.port) || other.port == _this.port)&&(identical(other.autoLaunch, _this.autoLaunch) || other.autoLaunch == _this.autoLaunch)&&(identical(other.systemProxy, _this.systemProxy) || other.systemProxy == _this.systemProxy)&&(identical(other.tunEnable, _this.tunEnable) || other.tunEnable == _this.tunEnable)&&(identical(other.isStart, _this.isStart) || other.isStart == _this.isStart)&&(identical(other.locale, _this.locale) || other.locale == _this.locale)&&(identical(other.brightness, _this.brightness) || other.brightness == _this.brightness)&&const DeepCollectionEquality().equals(other.groups, _this.groups)&&const DeepCollectionEquality().equals(other.selectedMap, _this.selectedMap)&&(identical(other.wakelockEnabled, _this.wakelockEnabled) || other.wakelockEnabled == _this.wakelockEnabled)&&const DeepCollectionEquality().equals(other.delays, _this.delays)&&(identical(other.trayEnhancement, _this.trayEnhancement) || other.trayEnhancement == _this.trayEnhancement)&&(identical(other.enableTraySpeed, _this.enableTraySpeed) || other.enableTraySpeed == _this.enableTraySpeed));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TrayState&&(identical(other.mode, _this.mode) || other.mode == _this.mode)&&(identical(other.port, _this.port) || other.port == _this.port)&&(identical(other.autoLaunch, _this.autoLaunch) || other.autoLaunch == _this.autoLaunch)&&(identical(other.systemProxy, _this.systemProxy) || other.systemProxy == _this.systemProxy)&&(identical(other.tunEnable, _this.tunEnable) || other.tunEnable == _this.tunEnable)&&(identical(other.isStart, _this.isStart) || other.isStart == _this.isStart)&&(identical(other.locale, _this.locale) || other.locale == _this.locale)&&(identical(other.brightness, _this.brightness) || other.brightness == _this.brightness)&&const DeepCollectionEquality().equals(other.groups, _this.groups)&&const DeepCollectionEquality().equals(other.selectedMap, _this.selectedMap)&&(identical(other.wakelockEnabled, _this.wakelockEnabled) || other.wakelockEnabled == _this.wakelockEnabled)&&const DeepCollectionEquality().equals(other.delays, _this.delays)&&(identical(other.trayEnhancement, _this.trayEnhancement) || other.trayEnhancement == _this.trayEnhancement)&&(identical(other.enableTraySpeed, _this.enableTraySpeed) || other.enableTraySpeed == _this.enableTraySpeed)&&(identical(other.enableTaskbarTraffic, _this.enableTaskbarTraffic) || other.enableTaskbarTraffic == _this.enableTaskbarTraffic));
 }
 
 
 @override
 int get hashCode {
   final _this = this as TrayState;
-  return Object.hash(runtimeType,_this.mode,_this.port,_this.autoLaunch,_this.systemProxy,_this.tunEnable,_this.isStart,_this.locale,_this.brightness,const DeepCollectionEquality().hash(_this.groups),const DeepCollectionEquality().hash(_this.selectedMap),_this.wakelockEnabled,const DeepCollectionEquality().hash(_this.delays),_this.trayEnhancement,_this.enableTraySpeed);
+  return Object.hash(runtimeType,_this.mode,_this.port,_this.autoLaunch,_this.systemProxy,_this.tunEnable,_this.isStart,_this.locale,_this.brightness,const DeepCollectionEquality().hash(_this.groups),const DeepCollectionEquality().hash(_this.selectedMap),_this.wakelockEnabled,const DeepCollectionEquality().hash(_this.delays),_this.trayEnhancement,_this.enableTraySpeed,_this.enableTaskbarTraffic);
 }
 
 @override
 String toString() {
   final _this = this as TrayState;
-  return 'TrayState(mode: ${_this.mode}, port: ${_this.port}, autoLaunch: ${_this.autoLaunch}, systemProxy: ${_this.systemProxy}, tunEnable: ${_this.tunEnable}, isStart: ${_this.isStart}, locale: ${_this.locale}, brightness: ${_this.brightness}, groups: ${_this.groups}, selectedMap: ${_this.selectedMap}, wakelockEnabled: ${_this.wakelockEnabled}, delays: ${_this.delays}, trayEnhancement: ${_this.trayEnhancement}, enableTraySpeed: ${_this.enableTraySpeed})';
+  return 'TrayState(mode: ${_this.mode}, port: ${_this.port}, autoLaunch: ${_this.autoLaunch}, systemProxy: ${_this.systemProxy}, tunEnable: ${_this.tunEnable}, isStart: ${_this.isStart}, locale: ${_this.locale}, brightness: ${_this.brightness}, groups: ${_this.groups}, selectedMap: ${_this.selectedMap}, wakelockEnabled: ${_this.wakelockEnabled}, delays: ${_this.delays}, trayEnhancement: ${_this.trayEnhancement}, enableTraySpeed: ${_this.enableTraySpeed}, enableTaskbarTraffic: ${_this.enableTaskbarTraffic})';
 }
 
 
@@ -1950,7 +1950,7 @@ abstract mixin class $TrayStateCopyWith<$Res>  {
   factory $TrayStateCopyWith(TrayState value, $Res Function(TrayState) _then) = _$TrayStateCopyWithImpl;
 @useResult
 $Res call({
- Mode mode, int port, bool autoLaunch, bool systemProxy, bool tunEnable, bool isStart, String? locale, Brightness? brightness, List<Group> groups, SelectedMap selectedMap, bool wakelockEnabled, Map<String, int?> delays, bool trayEnhancement, bool enableTraySpeed
+ Mode mode, int port, bool autoLaunch, bool systemProxy, bool tunEnable, bool isStart, String? locale, Brightness? brightness, List<Group> groups, SelectedMap selectedMap, bool wakelockEnabled, Map<String, int?> delays, bool trayEnhancement, bool enableTraySpeed, bool enableTaskbarTraffic
 });
 
 
@@ -1967,7 +1967,7 @@ class _$TrayStateCopyWithImpl<$Res>
 
 /// Create a copy of TrayState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? mode = null,Object? port = null,Object? autoLaunch = null,Object? systemProxy = null,Object? tunEnable = null,Object? isStart = null,Object? locale = freezed,Object? brightness = freezed,Object? groups = null,Object? selectedMap = null,Object? wakelockEnabled = null,Object? delays = null,Object? trayEnhancement = null,Object? enableTraySpeed = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? mode = null,Object? port = null,Object? autoLaunch = null,Object? systemProxy = null,Object? tunEnable = null,Object? isStart = null,Object? locale = freezed,Object? brightness = freezed,Object? groups = null,Object? selectedMap = null,Object? wakelockEnabled = null,Object? delays = null,Object? trayEnhancement = null,Object? enableTraySpeed = null,Object? enableTaskbarTraffic = null,}) {
   return _then(TrayState(
 mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
 as Mode,port: null == port ? _self.port : port // ignore: cast_nullable_to_non_nullable
@@ -1983,6 +1983,7 @@ as SelectedMap,wakelockEnabled: null == wakelockEnabled ? _self.wakelockEnabled 
 as bool,delays: null == delays ? _self.delays : delays // ignore: cast_nullable_to_non_nullable
 as Map<String, int?>,trayEnhancement: null == trayEnhancement ? _self.trayEnhancement : trayEnhancement // ignore: cast_nullable_to_non_nullable
 as bool,enableTraySpeed: null == enableTraySpeed ? _self.enableTraySpeed : enableTraySpeed // ignore: cast_nullable_to_non_nullable
+as bool,enableTaskbarTraffic: null == enableTaskbarTraffic ? _self.enableTaskbarTraffic : enableTaskbarTraffic // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -2068,10 +2069,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Mode mode,  int port,  bool autoLaunch,  bool systemProxy,  bool tunEnable,  bool isStart,  String? locale,  Brightness? brightness,  List<Group> groups,  SelectedMap selectedMap,  bool wakelockEnabled,  Map<String, int?> delays,  bool trayEnhancement,  bool enableTraySpeed)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Mode mode,  int port,  bool autoLaunch,  bool systemProxy,  bool tunEnable,  bool isStart,  String? locale,  Brightness? brightness,  List<Group> groups,  SelectedMap selectedMap,  bool wakelockEnabled,  Map<String, int?> delays,  bool trayEnhancement,  bool enableTraySpeed,  bool enableTaskbarTraffic)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TrayState() when $default != null:
-return $default(_that.mode,_that.port,_that.autoLaunch,_that.systemProxy,_that.tunEnable,_that.isStart,_that.locale,_that.brightness,_that.groups,_that.selectedMap,_that.wakelockEnabled,_that.delays,_that.trayEnhancement,_that.enableTraySpeed);case _:
+return $default(_that.mode,_that.port,_that.autoLaunch,_that.systemProxy,_that.tunEnable,_that.isStart,_that.locale,_that.brightness,_that.groups,_that.selectedMap,_that.wakelockEnabled,_that.delays,_that.trayEnhancement,_that.enableTraySpeed,_that.enableTaskbarTraffic);case _:
   return orElse();
 
 }
@@ -2089,10 +2090,10 @@ return $default(_that.mode,_that.port,_that.autoLaunch,_that.systemProxy,_that.t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Mode mode,  int port,  bool autoLaunch,  bool systemProxy,  bool tunEnable,  bool isStart,  String? locale,  Brightness? brightness,  List<Group> groups,  SelectedMap selectedMap,  bool wakelockEnabled,  Map<String, int?> delays,  bool trayEnhancement,  bool enableTraySpeed)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Mode mode,  int port,  bool autoLaunch,  bool systemProxy,  bool tunEnable,  bool isStart,  String? locale,  Brightness? brightness,  List<Group> groups,  SelectedMap selectedMap,  bool wakelockEnabled,  Map<String, int?> delays,  bool trayEnhancement,  bool enableTraySpeed,  bool enableTaskbarTraffic)  $default,) {final _that = this;
 switch (_that) {
 case _TrayState():
-return $default(_that.mode,_that.port,_that.autoLaunch,_that.systemProxy,_that.tunEnable,_that.isStart,_that.locale,_that.brightness,_that.groups,_that.selectedMap,_that.wakelockEnabled,_that.delays,_that.trayEnhancement,_that.enableTraySpeed);case _:
+return $default(_that.mode,_that.port,_that.autoLaunch,_that.systemProxy,_that.tunEnable,_that.isStart,_that.locale,_that.brightness,_that.groups,_that.selectedMap,_that.wakelockEnabled,_that.delays,_that.trayEnhancement,_that.enableTraySpeed,_that.enableTaskbarTraffic);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2109,10 +2110,10 @@ return $default(_that.mode,_that.port,_that.autoLaunch,_that.systemProxy,_that.t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Mode mode,  int port,  bool autoLaunch,  bool systemProxy,  bool tunEnable,  bool isStart,  String? locale,  Brightness? brightness,  List<Group> groups,  SelectedMap selectedMap,  bool wakelockEnabled,  Map<String, int?> delays,  bool trayEnhancement,  bool enableTraySpeed)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Mode mode,  int port,  bool autoLaunch,  bool systemProxy,  bool tunEnable,  bool isStart,  String? locale,  Brightness? brightness,  List<Group> groups,  SelectedMap selectedMap,  bool wakelockEnabled,  Map<String, int?> delays,  bool trayEnhancement,  bool enableTraySpeed,  bool enableTaskbarTraffic)?  $default,) {final _that = this;
 switch (_that) {
 case _TrayState() when $default != null:
-return $default(_that.mode,_that.port,_that.autoLaunch,_that.systemProxy,_that.tunEnable,_that.isStart,_that.locale,_that.brightness,_that.groups,_that.selectedMap,_that.wakelockEnabled,_that.delays,_that.trayEnhancement,_that.enableTraySpeed);case _:
+return $default(_that.mode,_that.port,_that.autoLaunch,_that.systemProxy,_that.tunEnable,_that.isStart,_that.locale,_that.brightness,_that.groups,_that.selectedMap,_that.wakelockEnabled,_that.delays,_that.trayEnhancement,_that.enableTraySpeed,_that.enableTaskbarTraffic);case _:
   return null;
 
 }
@@ -2124,7 +2125,7 @@ return $default(_that.mode,_that.port,_that.autoLaunch,_that.systemProxy,_that.t
 
 
 class _TrayState implements TrayState {
-  const _TrayState({required this.mode, required this.port, required this.autoLaunch, required this.systemProxy, required this.tunEnable, required this.isStart, required this.locale, required this.brightness, required  List<Group> groups, required  SelectedMap selectedMap, this.wakelockEnabled = false,  Map<String, int?> delays = const {}, this.trayEnhancement = true, this.enableTraySpeed = false}): _groups = groups,_selectedMap = selectedMap,_delays = delays;
+  const _TrayState({required this.mode, required this.port, required this.autoLaunch, required this.systemProxy, required this.tunEnable, required this.isStart, required this.locale, required this.brightness, required  List<Group> groups, required  SelectedMap selectedMap, this.wakelockEnabled = false,  Map<String, int?> delays = const {}, this.trayEnhancement = true, this.enableTraySpeed = false, this.enableTaskbarTraffic = false}): _groups = groups,_selectedMap = selectedMap,_delays = delays;
   
 
 @override final  Mode mode;
@@ -2159,6 +2160,7 @@ class _TrayState implements TrayState {
 
 @override@JsonKey() final  bool trayEnhancement;
 @override@JsonKey() final  bool enableTraySpeed;
+@override@JsonKey() final  bool enableTaskbarTraffic;
 
 /// Create a copy of TrayState
 /// with the given fields replaced by the non-null parameter values.
@@ -2170,18 +2172,18 @@ _$TrayStateCopyWith<_TrayState> get copyWith => __$TrayStateCopyWithImpl<_TraySt
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TrayState&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.port, port) || other.port == port)&&(identical(other.autoLaunch, autoLaunch) || other.autoLaunch == autoLaunch)&&(identical(other.systemProxy, systemProxy) || other.systemProxy == systemProxy)&&(identical(other.tunEnable, tunEnable) || other.tunEnable == tunEnable)&&(identical(other.isStart, isStart) || other.isStart == isStart)&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.brightness, brightness) || other.brightness == brightness)&&const DeepCollectionEquality().equals(other.groups, _groups)&&const DeepCollectionEquality().equals(other.selectedMap, _selectedMap)&&(identical(other.wakelockEnabled, wakelockEnabled) || other.wakelockEnabled == wakelockEnabled)&&const DeepCollectionEquality().equals(other.delays, _delays)&&(identical(other.trayEnhancement, trayEnhancement) || other.trayEnhancement == trayEnhancement)&&(identical(other.enableTraySpeed, enableTraySpeed) || other.enableTraySpeed == enableTraySpeed));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TrayState&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.port, port) || other.port == port)&&(identical(other.autoLaunch, autoLaunch) || other.autoLaunch == autoLaunch)&&(identical(other.systemProxy, systemProxy) || other.systemProxy == systemProxy)&&(identical(other.tunEnable, tunEnable) || other.tunEnable == tunEnable)&&(identical(other.isStart, isStart) || other.isStart == isStart)&&(identical(other.locale, locale) || other.locale == locale)&&(identical(other.brightness, brightness) || other.brightness == brightness)&&const DeepCollectionEquality().equals(other.groups, _groups)&&const DeepCollectionEquality().equals(other.selectedMap, _selectedMap)&&(identical(other.wakelockEnabled, wakelockEnabled) || other.wakelockEnabled == wakelockEnabled)&&const DeepCollectionEquality().equals(other.delays, _delays)&&(identical(other.trayEnhancement, trayEnhancement) || other.trayEnhancement == trayEnhancement)&&(identical(other.enableTraySpeed, enableTraySpeed) || other.enableTraySpeed == enableTraySpeed)&&(identical(other.enableTaskbarTraffic, enableTaskbarTraffic) || other.enableTaskbarTraffic == enableTaskbarTraffic));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,mode,port,autoLaunch,systemProxy,tunEnable,isStart,locale,brightness,const DeepCollectionEquality().hash(_groups),const DeepCollectionEquality().hash(_selectedMap),wakelockEnabled,const DeepCollectionEquality().hash(_delays),trayEnhancement,enableTraySpeed);
+    return Object.hash(runtimeType,mode,port,autoLaunch,systemProxy,tunEnable,isStart,locale,brightness,const DeepCollectionEquality().hash(_groups),const DeepCollectionEquality().hash(_selectedMap),wakelockEnabled,const DeepCollectionEquality().hash(_delays),trayEnhancement,enableTraySpeed,enableTaskbarTraffic);
 }
 
 @override
 String toString() {
-    return 'TrayState(mode: $mode, port: $port, autoLaunch: $autoLaunch, systemProxy: $systemProxy, tunEnable: $tunEnable, isStart: $isStart, locale: $locale, brightness: $brightness, groups: $groups, selectedMap: $selectedMap, wakelockEnabled: $wakelockEnabled, delays: $delays, trayEnhancement: $trayEnhancement, enableTraySpeed: $enableTraySpeed)';
+    return 'TrayState(mode: $mode, port: $port, autoLaunch: $autoLaunch, systemProxy: $systemProxy, tunEnable: $tunEnable, isStart: $isStart, locale: $locale, brightness: $brightness, groups: $groups, selectedMap: $selectedMap, wakelockEnabled: $wakelockEnabled, delays: $delays, trayEnhancement: $trayEnhancement, enableTraySpeed: $enableTraySpeed, enableTaskbarTraffic: $enableTaskbarTraffic)';
 }
 
 
@@ -2192,7 +2194,7 @@ abstract mixin class _$TrayStateCopyWith<$Res> implements $TrayStateCopyWith<$Re
   factory _$TrayStateCopyWith(_TrayState value, $Res Function(_TrayState) _then) = __$TrayStateCopyWithImpl;
 @override @useResult
 $Res call({
- Mode mode, int port, bool autoLaunch, bool systemProxy, bool tunEnable, bool isStart, String? locale, Brightness? brightness, List<Group> groups, SelectedMap selectedMap, bool wakelockEnabled, Map<String, int?> delays, bool trayEnhancement, bool enableTraySpeed
+ Mode mode, int port, bool autoLaunch, bool systemProxy, bool tunEnable, bool isStart, String? locale, Brightness? brightness, List<Group> groups, SelectedMap selectedMap, bool wakelockEnabled, Map<String, int?> delays, bool trayEnhancement, bool enableTraySpeed, bool enableTaskbarTraffic
 });
 
 
@@ -2209,7 +2211,7 @@ class __$TrayStateCopyWithImpl<$Res>
 
 /// Create a copy of TrayState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? mode = null,Object? port = null,Object? autoLaunch = null,Object? systemProxy = null,Object? tunEnable = null,Object? isStart = null,Object? locale = freezed,Object? brightness = freezed,Object? groups = null,Object? selectedMap = null,Object? wakelockEnabled = null,Object? delays = null,Object? trayEnhancement = null,Object? enableTraySpeed = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? mode = null,Object? port = null,Object? autoLaunch = null,Object? systemProxy = null,Object? tunEnable = null,Object? isStart = null,Object? locale = freezed,Object? brightness = freezed,Object? groups = null,Object? selectedMap = null,Object? wakelockEnabled = null,Object? delays = null,Object? trayEnhancement = null,Object? enableTraySpeed = null,Object? enableTaskbarTraffic = null,}) {
   return _then(_TrayState(
 mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
 as Mode,port: null == port ? _self.port : port // ignore: cast_nullable_to_non_nullable
@@ -2225,6 +2227,7 @@ as SelectedMap,wakelockEnabled: null == wakelockEnabled ? _self.wakelockEnabled 
 as bool,delays: null == delays ? _self._delays : delays // ignore: cast_nullable_to_non_nullable
 as Map<String, int?>,trayEnhancement: null == trayEnhancement ? _self.trayEnhancement : trayEnhancement // ignore: cast_nullable_to_non_nullable
 as bool,enableTraySpeed: null == enableTraySpeed ? _self.enableTraySpeed : enableTraySpeed // ignore: cast_nullable_to_non_nullable
+as bool,enableTaskbarTraffic: null == enableTaskbarTraffic ? _self.enableTaskbarTraffic : enableTaskbarTraffic // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
