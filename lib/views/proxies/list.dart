@@ -449,7 +449,14 @@ class _GroupHeader extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Text(group.type.name, style: labelLightStyle),
+                      Flexible(
+                        child: Text(
+                          group.type.name,
+                          style: labelLightStyle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                       if (selectedProxyName.isNotEmpty) ...[
                         Text('  •  ', style: labelLightStyle),
                         if (selectedProxyIcon.isNotEmpty) ...[
@@ -467,11 +474,15 @@ class _GroupHeader extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        ProxyDelayText(
-                          proxy:
-                              selectedProxy ??
-                              Proxy(name: selectedProxyName, type: ''),
-                          testUrl: group.testUrl,
+                        Flexible(
+                          child: ProxyDelayText(
+                            proxy:
+                                selectedProxy ??
+                                Proxy(name: selectedProxyName, type: ''),
+                            testUrl: group.testUrl,
+                            enableTest: false,
+                            useLabelMedium: true,
+                          ),
                         ),
                       ],
                     ],
@@ -479,11 +490,11 @@ class _GroupHeader extends ConsumerWidget {
                 ],
               ),
             ),
-            if (isExpand)
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(width: 4),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(width: 4),
+                if (isExpand)
                   _PressScaleWrapper(
                     child: SizedBox.square(
                       dimension: 36,
@@ -496,41 +507,41 @@ class _GroupHeader extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  AnimatedBuilder(
-                    animation: delayTestCoordinator,
-                    builder: (_, _) {
-                      final isTestingThisGroup = delayTestCoordinator
-                          .isTestingGroup(group.name);
-                      return _PressScaleWrapper(
-                        enabled: !delayTestCoordinator.isTesting,
-                        child: SizedBox(
-                          width: 44,
-                          height: 36,
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            visualDensity: VisualDensity.compact,
-                            icon: isTestingThisGroup
-                                ? const RepaintBoundary(
-                                    child: SizedBox.square(
-                                      dimension: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
+                AnimatedBuilder(
+                  animation: delayTestCoordinator,
+                  builder: (_, _) {
+                    final isTestingThisGroup = delayTestCoordinator
+                        .isTestingGroup(group.name);
+                    return _PressScaleWrapper(
+                      enabled: !delayTestCoordinator.isTesting,
+                      child: SizedBox(
+                        width: 44,
+                        height: 36,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                          icon: isTestingThisGroup
+                              ? const RepaintBoundary(
+                                  child: SizedBox.square(
+                                    dimension: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
                                     ),
-                                  )
-                                : const Icon(Icons.network_ping),
-                            onPressed: delayTestCoordinator.isTesting
-                                ? null
-                                : () => _delayTest(context),
-                            tooltip: appLocalizations.startTest,
-                          ),
+                                  ),
+                                )
+                              : const Icon(Icons.network_ping),
+                          onPressed: delayTestCoordinator.isTesting
+                              ? null
+                              : () => _delayTest(context),
+                          tooltip: appLocalizations.startTest,
                         ),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                ],
-              ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 4),
+              ],
+            ),
             _PressScaleWrapper(
               child: SizedBox.square(
                 dimension: 36,

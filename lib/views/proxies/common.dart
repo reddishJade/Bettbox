@@ -8,25 +8,34 @@ import 'package:flutter/foundation.dart';
 
 class DelayTestCoordinator extends ChangeNotifier {
   String? _testingGroupName;
+  bool _testingAll = false;
 
   String? get testingGroupName => _testingGroupName;
 
-  bool get isTesting => _testingGroupName != null;
+  bool get isTestingAll => _testingAll;
+  bool get isTesting => _testingAll || _testingGroupName != null;
 
   bool isTestingGroup(String groupName) => _testingGroupName == groupName;
 
-  Future<bool> run(String groupName, Future<void> Function() action) async {
+  Future<bool> run(String groupName, Future<void> Function() action) =>
+      _run(groupName, action);
+
+  Future<bool> runAll(Future<void> Function() action) => _run(null, action);
+
+  Future<bool> _run(String? groupName, Future<void> Function() action) async {
     if (isTesting) {
       return false;
     }
 
     _testingGroupName = groupName;
+    _testingAll = groupName == null;
     notifyListeners();
     try {
       await action();
       return true;
     } finally {
       _testingGroupName = null;
+      _testingAll = false;
       notifyListeners();
     }
   }
@@ -134,17 +143,40 @@ Future<void> delayTest(
   String? groupName,
   Future<void> Function()? onDelayUpdated,
 }) async {
-  Future<void> runTest() async {
-    final appController = globalState.appController;
-    final currentGroups = appController.getCurrentGroups();
-    final targets = <DelayTestTarget>{};
-    for (final proxy in proxies) {
+  Future<void> runTest() => _delayTestTargets([
+    (proxies: proxies, testUrl: testUrl),
+  ], onDelayUpdated: onDelayUpdated);
+
+  if (groupName == null || groupName.isEmpty) {
+    await runTest();
+    return;
+  }
+  await delayTestCoordinator.run(groupName, runTest);
+}
+
+Future<void> delayTestAllGroups(List<Group> groups) async {
+  await delayTestCoordinator.runAll(
+    () => _delayTestTargets([
+      for (final group in groups) (proxies: group.all, testUrl: group.testUrl),
+    ]),
+  );
+}
+
+Future<void> _delayTestTargets(
+  List<({List<Proxy> proxies, String? testUrl})> batches, {
+  Future<void> Function()? onDelayUpdated,
+}) async {
+  final appController = globalState.appController;
+  final currentGroups = appController.getCurrentGroups();
+  final targets = <DelayTestTarget>{};
+  for (final batch in batches) {
+    for (final proxy in batch.proxies) {
       if (_isNonTestableProxy(proxy)) {
         continue;
       }
       final state = appController.getProxyCardState(proxy.name);
       final url = appController.getRealTestUrl(
-        state.testUrl.getSafeValue(testUrl ?? ''),
+        state.testUrl.getSafeValue(batch.testUrl ?? ''),
       );
       final name = state.proxyName;
       if (name.isEmpty ||
@@ -155,46 +187,40 @@ Future<void> delayTest(
       }
       targets.add(DelayTestTarget(name: name, url: url));
     }
-    final concurrencyLimit = globalState.config.proxiesStyle.concurrencyLimit;
+  }
+  final concurrencyLimit = globalState.config.proxiesStyle.concurrencyLimit;
 
-    // 按实际节点和实际测试地址创建任务，避免多个代理组别名重复测速。
-    final delayTasks = targets.map((target) {
-      return () async {
-        await _testProxyDelay(target);
-        await onDelayUpdated?.call();
-      };
-    }).toList();
+  // 按实际节点和实际测试地址创建任务，避免多个代理组别名重复测速。
+  final delayTasks = targets.map((target) {
+    return () async {
+      await _testProxyDelay(target);
+      await onDelayUpdated?.call();
+    };
+  }).toList();
 
-    if (concurrencyLimit <= 1 || delayTasks.length <= 1) {
-      for (final task in delayTasks) {
-        await task();
+  if (concurrencyLimit <= 1 || delayTasks.length <= 1) {
+    for (final task in delayTasks) {
+      await task();
+    }
+  } else {
+    var nextIndex = 0;
+    final running = <Future<void>>{};
+    while (nextIndex < delayTasks.length || running.isNotEmpty) {
+      while (nextIndex < delayTasks.length &&
+          running.length < concurrencyLimit) {
+        final task = delayTasks[nextIndex++];
+        late final Future<void> future;
+        future = task().whenComplete(() {
+          running.remove(future);
+        });
+        running.add(future);
       }
-    } else {
-      var nextIndex = 0;
-      final running = <Future<void>>{};
-      while (nextIndex < delayTasks.length || running.isNotEmpty) {
-        while (nextIndex < delayTasks.length &&
-            running.length < concurrencyLimit) {
-          final task = delayTasks[nextIndex++];
-          late final Future<void> future;
-          future = task().whenComplete(() {
-            running.remove(future);
-          });
-          running.add(future);
-        }
-        if (running.isNotEmpty) {
-          await Future.any(running);
-        }
+      if (running.isNotEmpty) {
+        await Future.any(running);
       }
     }
-    appController.addSortNum();
   }
-
-  if (groupName == null || groupName.isEmpty) {
-    await runTest();
-    return;
-  }
-  await delayTestCoordinator.run(groupName, runTest);
+  appController.addSortNum();
 }
 
 double getScrollToSelectedOffset({

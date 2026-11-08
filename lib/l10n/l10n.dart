@@ -2490,6 +2490,16 @@ class AppLocalizations {
     return Intl.message('Delay Test', name: 'startTest', desc: '', args: []);
   }
 
+  /// `Test all groups`
+  String get testAllGroups {
+    return Intl.message(
+      'Test all groups',
+      name: 'testAllGroups',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Add Profile`
   String get addProfile {
     return Intl.message('Add Profile', name: 'addProfile', desc: '', args: []);

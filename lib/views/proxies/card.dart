@@ -49,12 +49,14 @@ class ProxyDelayText extends StatelessWidget {
   final Proxy proxy;
   final String? testUrl;
   final bool enableTest;
+  final bool useLabelMedium;
 
   const ProxyDelayText({
     super.key,
     required this.proxy,
     this.testUrl,
     this.enableTest = true,
+    this.useLabelMedium = false,
   });
 
   bool get _isNonTestableProxy {
@@ -74,7 +76,9 @@ class ProxyDelayText extends StatelessWidget {
     if (_isNonTestableProxy) {
       return const SizedBox.shrink();
     }
-    final labelSmallHeight = globalState.measure.labelSmallHeight;
+    final labelSmallHeight = useLabelMedium
+        ? globalState.measure.labelMediumHeight
+        : globalState.measure.labelSmallHeight;
     return SizedBox(
       height: labelSmallHeight,
       child: Consumer(
@@ -117,10 +121,14 @@ class ProxyDelayText extends StatelessWidget {
 
           final text = Text(
             delay > 0 ? '$delay ms' : 'Timeout',
-            style: context.textTheme.labelSmall?.copyWith(
-              overflow: TextOverflow.ellipsis,
-              color: utils.getDelayColor(delay),
-            ),
+            style:
+                (useLabelMedium
+                        ? context.textTheme.labelMedium
+                        : context.textTheme.labelSmall)
+                    ?.copyWith(
+                      overflow: TextOverflow.ellipsis,
+                      color: utils.getDelayColor(delay),
+                    ),
           );
 
           if (!enableTest) return text;

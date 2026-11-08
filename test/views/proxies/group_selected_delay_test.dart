@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/clash/interface.dart';
@@ -9,22 +10,23 @@ import 'package:bett_box/l10n/l10n.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/views/proxies/common.dart';
 import 'package:bett_box/views/proxies/list.dart';
+import 'package:bett_box/views/proxies/proxies.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
 class _FakeClash implements ClashHandlerInterface {
-  final result = Completer<String>();
-  String? testedUrl;
-  String? testedProxy;
+  final requests = <(String, String)>[];
+  final result = Completer<void>();
 
   @override
-  Future<String> asyncTestDelay(String url, String proxyName) {
-    testedUrl = url;
-    testedProxy = proxyName;
-    return result.future;
+  Future<String> asyncTestDelay(String url, String proxyName) async {
+    requests.add((url, proxyName));
+    await result.future;
+    return jsonEncode({'name': proxyName, 'url': url, 'value': 42});
   }
 
   @override
@@ -111,17 +113,83 @@ void main() {
     expect(find.text('19 ms'), findsOneWidget);
     final fake = _FakeClash();
     clashCore.clashInterface = fake;
-    await tester.tap(find.text('19 ms'));
-    await tester.pump();
-    expect(fake.testedProxy, 'DIRECT');
-    expect(fake.testedUrl, 'https://group.test');
-    fake.result.complete(
-      '{"name":"DIRECT","url":"https://group.test","value":42}',
+    expect(find.byIcon(Icons.bolt), findsNothing);
+    expect(find.byIcon(Icons.network_ping), findsOneWidget);
+    expect(
+      tester.getCenter(find.text('Selector')).dy,
+      closeTo(tester.getCenter(find.text('19 ms')).dy, 1),
     );
-    await tester.pump(const Duration(milliseconds: 300));
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.byTooltip(appLocalizations.startTest));
+    await tester.pump();
+    expect(fake.requests, contains(('https://group.test', 'DIRECT')));
+    expect(find.text('first'), findsNothing);
+    fake.result.complete();
+    await tester.pumpAndSettle();
     expect(find.text('42 ms'), findsOneWidget);
     expect(find.text('first'), findsNothing);
+
+    final allFake = _FakeClash();
+    clashCore.clashInterface = allFake;
+    final allTest = delayTestAllGroups(const [
+      Group(
+        name: 'Main',
+        type: GroupType.Selector,
+        testUrl: 'https://group.test',
+        all: [Proxy(name: 'first', type: 'Shadowsocks')],
+      ),
+      Group(
+        name: 'Other',
+        type: GroupType.Selector,
+        testUrl: 'https://other.test',
+        all: [Proxy(name: 'first', type: 'Shadowsocks')],
+      ),
+      Group(
+        name: 'Duplicate',
+        type: GroupType.Selector,
+        testUrl: 'https://group.test',
+        all: [Proxy(name: 'first', type: 'Shadowsocks')],
+      ),
+    ]);
+    await tester.pump();
+    expect(delayTestCoordinator.isTestingAll, isTrue);
+    expect(allFake.requests, contains(('https://group.test', 'first')));
+    expect(allFake.requests, contains(('https://other.test', 'first')));
+    expect(allFake.requests, hasLength(2));
+    allFake.result.complete();
+    await allTest;
+    await tester.pumpAndSettle();
+    expect(delayTestCoordinator.isTesting, isFalse);
+
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(320, 800);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          localizationsDelegates: const [AppLocalizations.delegate],
+          home: Consumer(
+            builder: (context, ref, _) {
+              globalState.appController = AppController(context, ref);
+              globalState.measure = Measure.of(context, 1);
+              return const ProxiesView();
+            },
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    final pageFake = _FakeClash();
+    clashCore.clashInterface = pageFake;
+    await tester.tap(find.byTooltip(appLocalizations.testAllGroups));
+    await tester.pump();
+    expect(delayTestCoordinator.isTestingAll, isTrue);
+    expect(pageFake.requests, contains(('https://group.test', 'DIRECT')));
+    pageFake.result.complete();
+    await tester.pumpAndSettle();
+    expect(delayTestCoordinator.isTesting, isFalse);
     expect(tester.takeException(), isNull);
   });
 }

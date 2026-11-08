@@ -10,6 +10,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'common.dart';
 import 'group_switch_options.dart';
 import 'advanced_settings.dart';
 import 'setting.dart';
@@ -35,6 +36,22 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
     );
     final hasCustom = ref.watch(currentProfileIdProvider) != null;
     return [
+      AnimatedBuilder(
+        animation: delayTestCoordinator,
+        builder: (context, _) => IconButton(
+          onPressed:
+              delayTestCoordinator.isTesting || ref.read(groupsProvider).isEmpty
+              ? null
+              : () => delayTestAllGroups(ref.read(groupsProvider)),
+          tooltip: appLocalizations.testAllGroups,
+          icon: delayTestCoordinator.isTestingAll
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.network_ping),
+        ),
+      ),
       if (_isTab)
         IconButton(
           onPressed: () {

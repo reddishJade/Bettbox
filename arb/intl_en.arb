@@ -296,6 +296,7 @@
   "paste": "Paste",
   "testUrl": "Test URL",
   "startTest": "Delay Test",
+  "testAllGroups": "Test all groups",
   "addProfile": "Add Profile",
   "customUrl": "Custom URL",
   "sync": "Sync",
