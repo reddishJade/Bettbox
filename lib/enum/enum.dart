@@ -242,7 +242,6 @@ enum ActionMethod {
   getRuntimeConfig,
   exportConfig,
   getProxies,
-  getRules,
   changeProxy,
   getTraffic,
   getTotalTraffic,
@@ -500,7 +499,6 @@ enum PageLabel {
   logs,
   resources,
   toolbox,
-  rules,
   connections,
 }
 
@@ -521,8 +519,6 @@ extension PageLabelExtension on PageLabel {
         return appLocalizations.resources;
       case PageLabel.toolbox:
         return appLocalizations.toolbox;
-      case PageLabel.rules:
-        return appLocalizations.rule;
       case PageLabel.connections:
         return appLocalizations.navConnections;
     }
