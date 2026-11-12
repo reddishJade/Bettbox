@@ -58,7 +58,7 @@ class _GroupSwitchOptionsSheetState
     if (!mounted) return;
     final rawConfig = await globalState.appController.safeRun(
       silence: false,
-      () => globalState.getProfileConfig(widget.profileId),
+      () => globalState.getProfileSnippet(widget.profileId),
     );
     if (!mounted) return;
     if (rawConfig == null) {

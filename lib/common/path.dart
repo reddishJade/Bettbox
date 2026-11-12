@@ -9,7 +9,6 @@ import 'package:path_provider/path_provider.dart';
 class AppPath {
   static AppPath? _instance;
   Completer<Directory> dataDir = Completer();
-  Completer<Directory> downloadDir = Completer();
   Completer<Directory> tempDir = Completer();
   late String appDirPath;
   late final bool isPortable;
@@ -47,9 +46,6 @@ class AppPath {
         tempDir.complete(value);
       });
     }
-    getDownloadsDirectory().then((value) {
-      downloadDir.complete(value);
-    });
   }
 
   factory AppPath() {
@@ -188,7 +184,8 @@ class AppPath {
   }
 
   Future<String> get downloadDirPath async {
-    final directory = await downloadDir.future;
+    final directory = await getDownloadsDirectory();
+    if (directory == null) return (await dataDir.future).path;
     return directory.path;
   }
 
@@ -222,11 +219,6 @@ class AppPath {
     return join(directory.path, 'config.json');
   }
 
-  Future<String> get ipCacheFilePath async {
-    final tempDirectory = await tempPath;
-    return join(tempDirectory, 'ip_cache.json');
-  }
-
   Future<String> get speedTestPath async {
     final directory = await dataDir.future;
     return join(directory.path, 'speed_test.json');
@@ -235,6 +227,11 @@ class AppPath {
   Future<String> get toolHistoryPath async {
     final directory = await dataDir.future;
     return join(directory.path, 'toolbox_history.json');
+  }
+
+  Future<String> get iconSetsPath async {
+    final directory = await dataDir.future;
+    return join(directory.path, 'icon_sets.json');
   }
 
   Future<String> get helperAuthKeyPath async {
@@ -250,6 +247,11 @@ class AppPath {
   Future<String> getProfilePath(String id) async {
     final directory = await profilesPath;
     return join(directory, '$id.yaml');
+  }
+
+  Future<String> getScriptPath(String id) async {
+    final directory = await dataDir.future;
+    return join(directory.path, 'scripts', '${basename(id)}.js');
   }
 
   Future<String> getProvidersDirPath(String id) async {

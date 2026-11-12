@@ -1,4 +1,3 @@
-
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/state.dart';
@@ -182,19 +181,6 @@ class AppDAVSetting extends _$AppDAVSetting with AutoDisposeNotifierMixin {
 }
 
 @riverpod
-class OverrideDns extends _$OverrideDns with AutoDisposeNotifierMixin {
-  @override
-  bool build() {
-    return globalState.config.overrideDns;
-  }
-
-  @override
-  onUpdate(value) {
-    globalState.config = globalState.config.copyWith(overrideDns: value);
-  }
-}
-
-@riverpod
 class OverrideTestUrl extends _$OverrideTestUrl with AutoDisposeNotifierMixin {
   @override
   bool build() {
@@ -289,6 +275,43 @@ class ProxiesStyleSetting extends _$ProxiesStyleSetting
   }
 
   void updateState(ProxiesStyle Function(ProxiesStyle state) builder) {
+    state = builder(state);
+  }
+}
+
+@riverpod
+class TrafficStatsSetting extends _$TrafficStatsSetting
+    with AutoDisposeNotifierMixin {
+  @override
+  TrafficStatsProps build() {
+    return globalState.config.trafficStatsProps;
+  }
+
+  @override
+  onUpdate(value) {
+    globalState.config = globalState.config.copyWith(trafficStatsProps: value);
+  }
+
+  void updateState(
+    TrafficStatsProps Function(TrafficStatsProps state) builder,
+  ) {
+    state = builder(state);
+  }
+}
+
+@riverpod
+class ManagedSetting extends _$ManagedSetting with AutoDisposeNotifierMixin {
+  @override
+  ManagedProps build() {
+    return globalState.config.managedProps;
+  }
+
+  @override
+  onUpdate(value) {
+    globalState.config = globalState.config.copyWith(managedProps: value);
+  }
+
+  void updateState(ManagedProps Function(ManagedProps state) builder) {
     state = builder(state);
   }
 }

@@ -424,57 +424,6 @@ abstract class _$AppDAVSetting extends $Notifier<DAV?> {
   }
 }
 
-@ProviderFor(OverrideDns)
-final overrideDnsProvider = OverrideDnsProvider._();
-
-final class OverrideDnsProvider extends $NotifierProvider<OverrideDns, bool> {
-  OverrideDnsProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'overrideDnsProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$overrideDnsHash();
-
-  @$internal
-  @override
-  OverrideDns create() => OverrideDns();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(bool value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<bool>(value),
-    );
-  }
-}
-
-String _$overrideDnsHash() => r'1fc914de471319bf1e003edf9627b8c646b641bf';
-
-abstract class _$OverrideDns extends $Notifier<bool> {
-  bool build();
-  @$mustCallSuper
-  @override
-  WhenComplete runBuild() {
-    final ref = this.ref as $Ref<bool, bool>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<bool, bool>,
-              bool,
-              Object?,
-              Object?
-            >;
-    return element.handleCreate(ref, build);
-  }
-}
-
 @ProviderFor(OverrideTestUrl)
 final overrideTestUrlProvider = OverrideTestUrlProvider._();
 
@@ -833,6 +782,111 @@ abstract class _$ProxiesStyleSetting extends $Notifier<ProxiesStyle> {
             as $ClassProviderElement<
               AnyNotifier<ProxiesStyle, ProxiesStyle>,
               ProxiesStyle,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(TrafficStatsSetting)
+final trafficStatsSettingProvider = TrafficStatsSettingProvider._();
+
+final class TrafficStatsSettingProvider
+    extends $NotifierProvider<TrafficStatsSetting, TrafficStatsProps> {
+  TrafficStatsSettingProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'trafficStatsSettingProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$trafficStatsSettingHash();
+
+  @$internal
+  @override
+  TrafficStatsSetting create() => TrafficStatsSetting();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(TrafficStatsProps value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<TrafficStatsProps>(value),
+    );
+  }
+}
+
+String _$trafficStatsSettingHash() =>
+    r'5f758a4baa884a3be0e11e5876d7e8908a02bf6c';
+
+abstract class _$TrafficStatsSetting extends $Notifier<TrafficStatsProps> {
+  TrafficStatsProps build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<TrafficStatsProps, TrafficStatsProps>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<TrafficStatsProps, TrafficStatsProps>,
+              TrafficStatsProps,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(ManagedSetting)
+final managedSettingProvider = ManagedSettingProvider._();
+
+final class ManagedSettingProvider
+    extends $NotifierProvider<ManagedSetting, ManagedProps> {
+  ManagedSettingProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'managedSettingProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$managedSettingHash();
+
+  @$internal
+  @override
+  ManagedSetting create() => ManagedSetting();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ManagedProps value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ManagedProps>(value),
+    );
+  }
+}
+
+String _$managedSettingHash() => r'0e8d48bd653b0cf34e7ed8f1116649cf166cf587';
+
+abstract class _$ManagedSetting extends $Notifier<ManagedProps> {
+  ManagedProps build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<ManagedProps, ManagedProps>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<ManagedProps, ManagedProps>,
+              ManagedProps,
               Object?,
               Object?
             >;

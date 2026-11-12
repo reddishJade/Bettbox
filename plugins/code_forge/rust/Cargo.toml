@@ -14,18 +14,10 @@ ropey = { version = "1.6.1", default-features = false, features = ["simd"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 
 [profile.release]
+opt-level = "s"
 lto = true
 codegen-units = 1
 strip = true
-
-[profile.release.package.regex-automata]
-opt-level = "s"
-
-[profile.release.package.regex-syntax]
-opt-level = "s"
-
-[profile.release.package.fancy-regex]
-opt-level = "s"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

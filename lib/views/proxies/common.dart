@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
@@ -9,6 +11,9 @@ import 'package:flutter/foundation.dart';
 class DelayTestCoordinator extends ChangeNotifier {
   String? _testingGroupName;
   bool _testingAll = false;
+  int _epoch = 0;
+
+  int get epoch => _epoch;
 
   String? get testingGroupName => _testingGroupName;
 
@@ -27,6 +32,7 @@ class DelayTestCoordinator extends ChangeNotifier {
       return false;
     }
 
+    final epoch = _epoch;
     _testingGroupName = groupName;
     _testingAll = groupName == null;
     notifyListeners();
@@ -34,10 +40,20 @@ class DelayTestCoordinator extends ChangeNotifier {
       await action();
       return true;
     } finally {
-      _testingGroupName = null;
-      _testingAll = false;
-      notifyListeners();
+      if (epoch == _epoch) {
+        _testingGroupName = null;
+        _testingAll = false;
+        notifyListeners();
+      }
     }
+  }
+
+  void cancel() {
+    _epoch++;
+    if (!isTesting) return;
+    _testingGroupName = null;
+    _testingAll = false;
+    notifyListeners();
   }
 }
 
@@ -64,6 +80,9 @@ class DelayTestRequestPool {
 
   int get pendingCount => _pendingRequests.length;
 
+  Future<Delay>? pendingRequest(DelayTestTarget target) =>
+      _pendingRequests[target];
+
   Future<Delay> run(DelayTestTarget target, Future<Delay> Function() action) {
     final pendingRequest = _pendingRequests[target];
     if (pendingRequest != null) {
@@ -78,9 +97,16 @@ class DelayTestRequestPool {
       }
     });
   }
+
+  void clear() => _pendingRequests.clear();
 }
 
 final _delayTestRequestPool = DelayTestRequestPool();
+
+void cancelDelayTests() {
+  delayTestCoordinator.cancel();
+  _delayTestRequestPool.clear();
+}
 
 double get listHeaderHeight {
   final measure = globalState.measure;
@@ -114,13 +140,89 @@ Future<void> proxyDelayTest(Proxy proxy, [String? testUrl]) async {
 }
 
 Future<Delay> _testProxyDelay(DelayTestTarget target) {
+  final epoch = delayTestCoordinator.epoch;
   return _delayTestRequestPool.run(target, () async {
     final appController = globalState.appController;
     appController.setDelay(Delay(url: target.url, name: target.name, value: 0));
     final delay = await clashCore.getDelay(target.url, target.name);
-    appController.setDelay(delay);
+    if (epoch == delayTestCoordinator.epoch) {
+      appController.setDelay(delay);
+    }
     return delay;
   });
+}
+
+class _DelayProgressListener with AppMessageListener {
+  final Future<void> Function() onDelayUpdated;
+
+  _DelayProgressListener(this.onDelayUpdated);
+
+  @override
+  void onDelays(List<Delay> delays) {
+    unawaited(onDelayUpdated());
+  }
+}
+
+Future<void> _testProxyDelays(
+  Iterable<DelayTestTarget> targets, {
+  Future<void> Function()? onDelayUpdated,
+}) async {
+  final appController = globalState.appController;
+  final epoch = delayTestCoordinator.epoch;
+  final pending = <Future<Delay>>[];
+  final batch = <DelayTestTarget>[];
+  for (final target in targets) {
+    final request = _delayTestRequestPool.pendingRequest(target);
+    if (request != null) {
+      pending.add(request);
+    } else {
+      batch.add(target);
+    }
+  }
+  final listener = batch.isNotEmpty && onDelayUpdated != null
+      ? _DelayProgressListener(onDelayUpdated)
+      : null;
+  if (listener != null) clashMessage.addListener(listener);
+  try {
+    if (batch.isNotEmpty) {
+      for (final target in batch) {
+        appController.setDelay(
+          Delay(url: target.url, name: target.name, value: 0),
+        );
+      }
+      final results = clashCore
+          .getDelays([
+            for (final target in batch) (name: target.name, url: target.url),
+          ], concurrency: globalState.config.proxiesStyle.concurrencyLimit)
+          .then(
+            (delays) => {
+              for (final delay in delays)
+                DelayTestTarget(name: delay.name, url: delay.url): delay,
+            },
+            onError: (Object e) {
+              commonPrint.warn('Batch delay test failed: $e');
+              return <DelayTestTarget, Delay>{};
+            },
+          );
+      for (final target in batch) {
+        pending.add(
+          _delayTestRequestPool.run(target, () async {
+            final delay =
+                (await results)[target] ??
+                Delay(name: target.name, url: target.url, value: -1);
+            if (epoch == delayTestCoordinator.epoch) {
+              appController.setDelay(delay);
+            }
+            return delay;
+          }),
+        );
+      }
+    }
+    await Future.wait(pending);
+  } finally {
+    if (listener != null) clashMessage.removeListener(listener);
+  }
+  await onDelayUpdated?.call();
 }
 
 bool _isNonTestableProxyName(String proxyName) {

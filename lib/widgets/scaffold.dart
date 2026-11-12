@@ -36,6 +36,7 @@ class CommonScaffold extends StatefulWidget {
   final OnKeywordsUpdateCallback? onKeywordsUpdate;
   final List<String>? keywords;
   final bool scrollEdgeFade;
+  final VoidCallback? onAppBarDoubleTap;
 
   const CommonScaffold({
     super.key,
@@ -53,6 +54,7 @@ class CommonScaffold extends StatefulWidget {
     this.onKeywordsUpdate,
     this.keywords,
     this.scrollEdgeFade = true,
+    this.onAppBarDoubleTap,
   });
 
   @override
@@ -306,6 +308,12 @@ class CommonScaffoldState extends State<CommonScaffold> {
                     AppBar(
                       centerTitle: widget.centerTitle ?? false,
                       leading: _buildLeading(),
+                      flexibleSpace: widget.onAppBarDoubleTap != null
+                          ? GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onDoubleTap: widget.onAppBarDoubleTap,
+                            )
+                          : null,
                       title: _buildTitle(state.searchState),
                       actions: _buildActions(
                         state.searchState != null,
@@ -386,7 +394,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
             backgroundColor:
                 widget.backgroundColor ??
                 (isMobileView
-                    ? context.colorScheme.surfaceContainer
+                    ? context.colorScheme.pageColor
                     : Colors.transparent),
             floatingActionButton:
                 widget.floatingActionButton ??
@@ -466,7 +474,7 @@ class _ScrollEdgeFadeState extends ConsumerState<_ScrollEdgeFade> {
     final color =
         widget.backgroundColor ??
         (ref.watch(isMobileViewProvider)
-            ? context.colorScheme.surfaceContainer
+            ? context.colorScheme.pageColor
             : null);
     final opaque = color != null && color.a == 1;
     return NotificationListener<ScrollMetricsNotification>(

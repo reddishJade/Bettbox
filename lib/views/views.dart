@@ -12,3 +12,4 @@ export 'backup_and_recovery.dart';
 export 'resources.dart';
 export 'connection/connections.dart';
 export 'developer.dart';
+export 'icon_sets.dart';

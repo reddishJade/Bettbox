@@ -25,13 +25,18 @@ class ProxiesView extends ConsumerStatefulWidget {
 
 class _ProxiesViewState extends ConsumerState<ProxiesView> {
   final GlobalKey<ProxiesTabViewState> _proxiesTabKey = GlobalKey();
+  final GlobalKey<ProxiesListViewState> _proxiesListKey = GlobalKey();
   bool _hasProviders = false;
   bool _isTab = false;
 
   List<Widget> _buildActions() {
-    final (autoStickyHeader, showHiddenItems) = ref.watch(
+    final (autoStickyHeader, showHiddenItems, hideTimeoutProxies) = ref.watch(
       proxiesStyleSettingProvider.select(
-        (state) => (state.autoStickyHeader, state.showHiddenItems),
+        (state) => (
+          state.autoStickyHeader,
+          state.showHiddenItems,
+          state.hideTimeoutProxies,
+        ),
       ),
     );
     final hasCustom = ref.watch(currentProfileIdProvider) != null;
@@ -153,6 +158,22 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
                     );
               },
             ),
+            PopupMenuItemData(
+              icon: hideTimeoutProxies
+                  ? Icons.check_circle_rounded
+                  : Icons.circle_outlined,
+              label: appLocalizations.hideTimeoutProxies,
+              onPressed: () {
+                ref
+                    .read(proxiesStyleSettingProvider.notifier)
+                    .updateState(
+                      (state) => state.copyWith(
+                        hideTimeoutProxies: !hideTimeoutProxies,
+                      ),
+                    );
+                globalState.appController.addSortNum();
+              },
+            ),
           ],
         ),
       ),
@@ -182,6 +203,10 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
         );
       },
     );
+  }
+
+  void _collapseAllGroups() {
+    _proxiesListKey.currentState?.collapseAll();
   }
 
   void _onSearch(String value) {
@@ -239,12 +264,24 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
       actions: _buildActions(),
       title: appLocalizations.proxies,
       scrollEdgeFade: proxiesType == ProxiesType.list && !autoStickyHeader,
+      onAppBarDoubleTap: proxiesType == ProxiesType.list
+          ? _collapseAllGroups
+          : null,
       searchState: AppBarSearchState(onSearch: _onSearch),
       body: switch (hasGroups) {
-        false => NullStatus(label: appLocalizations.noProxy),
+        false => NullStatus(
+          label: appLocalizations.noProxy,
+          icon: Icons.cloud_off_outlined,
+          description: appLocalizations.noProxyDesc,
+          action: FilledButton.tonalIcon(
+            onPressed: globalState.appController.toProfiles,
+            icon: const Icon(Icons.add, size: 18),
+            label: Text(appLocalizations.addProfile),
+          ),
+        ),
         true => switch (proxiesType) {
           ProxiesType.tab => ProxiesTabView(key: _proxiesTabKey),
-          ProxiesType.list => const ProxiesListView(),
+          ProxiesType.list => ProxiesListView(key: _proxiesListKey),
         },
       },
     );

@@ -49,6 +49,13 @@ jobs:
       - name: Get dependencies
         run: flutter pub get --enforce-lockfile
 
+      - name: Download bundled rules
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p assets/data
+          gh release download latest --repo appshubcc/bett-rules --pattern BundleMRS.7z --dir assets/data
+
       - name: Generate Dart code
         run: dart run build_runner build
 

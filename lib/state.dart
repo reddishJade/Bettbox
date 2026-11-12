@@ -15,6 +15,7 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/providers/state.dart' as providers_state;
 
 import 'package:bett_box/widgets/dialog.dart';
+import 'package:bett_box/widgets/sheet.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
@@ -45,9 +46,7 @@ class GlobalState {
       _config ??
       Config(
         themeProps: defaultThemeProps,
-        patchClashConfig: system.isAndroid
-            ? const ClashConfig(findProcessMode: FindProcessMode.always)
-            : defaultClashConfig,
+        patchClashConfig: defaultClashConfig,
         networkProps: defaultNetworkProps,
         appSetting: defaultAppSettingProps,
       );
@@ -228,9 +227,7 @@ class GlobalState {
         await preferences.getConfig() ??
         Config(
           themeProps: defaultThemeProps,
-          patchClashConfig: system.isAndroid
-              ? const ClashConfig(findProcessMode: FindProcessMode.always)
-              : defaultClashConfig,
+          patchClashConfig: defaultClashConfig,
           networkProps: defaultNetworkProps,
           appSetting: defaultAppSettingProps,
         );
@@ -315,18 +312,34 @@ class GlobalState {
     }
     render?.pause();
 
-    final vpnProps = appController.ref.read(vpnSettingProvider);
-    final keepTrafficUpdates =
-        (system.isAndroid && vpnProps.networkSpeedNotification) ||
-        (system.isMacOS && vpnProps.enableTraySpeed);
-    if (!keepTrafficUpdates) {
+    if (!_keepBackgroundTrafficUpdates) {
       stopUpdateTasks();
     }
 
     dashboardRefreshManager.stop();
   }
 
+  bool get _keepBackgroundTrafficUpdates {
+    final vpnProps = appController.ref.read(vpnSettingProvider);
+    return system.isMacOS && vpnProps.enableTraySpeed;
+  }
+
+  Future<void> handleScreenStateChanged(bool isOn) async {
+    isScreenOn = isOn;
+    if (!backgroundMode.value) return;
+    if (!_keepBackgroundTrafficUpdates) {
+      stopUpdateTasks();
+      return;
+    }
+    if (!isStart) return;
+    await startUpdateTasks([
+      appController.updateRunTime,
+      appController.updateTraffic,
+    ]);
+  }
+
   void handleForeground() {
+    isScreenOn = true;
     if (system.isDesktop) {
       animationEnabled.value = true;
     }
@@ -346,18 +359,14 @@ class GlobalState {
     if (!system.isAndroid) return;
     try {
       final actuallyRunning = await service?.getStatus() ?? false;
-      final flutterState = appState.runTime != null;
-
-      if (actuallyRunning && !flutterState) {
-        await updateStartTime();
-        if (startTime != null) {
-          appState = appState.copyWith(runTime: 0);
-          await startUpdateTasks([appController.updateTraffic]);
-        }
-      } else if (!actuallyRunning && flutterState) {
-        appState = appState.copyWith(runTime: null);
-        startTime = null;
-      }
+      if (!actuallyRunning || isStart) return;
+      await updateStartTime();
+      if (!isStart) return;
+      appController.ref.read(runTimeProvider.notifier).value = 0;
+      await startUpdateTasks([
+        appController.updateRunTime,
+        appController.updateTraffic,
+      ]);
     } catch (e) {
       commonPrint.warn('Sync VPN state error: $e');
     }
@@ -388,40 +397,25 @@ class GlobalState {
     });
 
     _backgroundCleanupTimer?.cancel();
-    _backgroundCleanupTimer = Timer(const Duration(seconds: 300), () {
-      _backgroundCleanupTimer = null;
-      if (!backgroundMode.value) {
-        return;
-      }
-      cleanupBackgroundResources();
-    });
+    _backgroundCleanupTimer = Timer(
+      Duration(seconds: system.isAndroid ? 180 : 300),
+      () {
+        _backgroundCleanupTimer = null;
+        if (!backgroundMode.value) {
+          return;
+        }
+        cleanupBackgroundResources();
+      },
+    );
   }
 
   Future<void> _checkAndRunBackgroundCoreGc() async {
     if (!backgroundMode.value) return;
-
-    const threshold = 2 * 1024 * 1024;
-    var consecutiveBusyCount = 0;
-
-    for (var i = 0; i < 3; i++) {
-      if (!backgroundMode.value) return;
-      try {
-        final traffic = await clashCore.getTraffic();
-        if (traffic.down.value > threshold || traffic.speed > threshold) {
-          consecutiveBusyCount++;
-        }
-      } catch (_) {}
-      if (i < 2) {
-        await Future.delayed(const Duration(seconds: 1));
-      }
+    try {
+      await clashCore.requestGc(forceFreeOSMemory: true, purge: false);
+    } catch (e) {
+      commonPrint.debug('Background requestGc ignored: $e');
     }
-
-    if (consecutiveBusyCount == 3) {
-      return;
-    }
-
-    if (!backgroundMode.value) return;
-    await clashCore.requestGc(forceFreeOSMemory: false);
   }
 
   void cleanupBackgroundResources() async {
@@ -433,6 +427,7 @@ class GlobalState {
     await Future.delayed(const Duration(milliseconds: 250));
     if (!backgroundMode.value) return;
     WidgetsBinding.instance.handleMemoryPressure();
+    if (system.isAndroid) await app.notifyLowMemory();
 
     await Future.delayed(const Duration(seconds: 3));
     if (!backgroundMode.value) return;
@@ -458,7 +453,6 @@ class GlobalState {
     await prefs?.setBool('is_vpn_running', true);
 
     if (system.isAndroid) {
-      await service?.setQuickResponse(config.vpnProps.quickResponse);
       await service?.setHighPriorityNotification(
         config.vpnProps.highPriorityNotification,
       );
@@ -534,11 +528,13 @@ class GlobalState {
             ],
             child: Container(
               width: 300,
-              constraints: const BoxConstraints(maxHeight: 200),
+              constraints: const BoxConstraints(maxHeight: 240),
               child: SingleChildScrollView(
                 child: SelectableText.rich(
                   TextSpan(
-                    style: Theme.of(context).textTheme.labelLarge,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(fontSize: 15, height: 1.5),
                     children: [message],
                   ),
                   style: const TextStyle(overflow: TextOverflow.visible),
@@ -567,10 +563,7 @@ class GlobalState {
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) => child,
       transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-        );
+        final curved = animation.drive(CurveTween(curve: Curves.easeOutCubic));
         return FadeTransition(
           opacity: curved,
           child: ScaleTransition(
@@ -579,6 +572,24 @@ class GlobalState {
           ),
         );
       },
+    );
+  }
+
+  Future<T?> showAdaptiveSheet<T>({
+    required Widget child,
+    bool nested = false,
+  }) async {
+    final context = navigatorKey.currentContext;
+    if (context == null) return null;
+    if (appState.viewMode != ViewMode.mobile) {
+      return await showCommonDialog<T>(child: child);
+    }
+    return await showSheet<T>(
+      context: context,
+      props: nested
+          ? const SheetProps(expandable: false, initialFraction: 0)
+          : const SheetProps(expandable: false),
+      builder: (_, _) => child,
     );
   }
 
@@ -707,6 +718,7 @@ class GlobalState {
       onlyStatisticsProxy: config.appSetting.onlyStatisticsProxy,
       currentProfileName: currentProfile?.label ?? currentProfile?.id ?? '',
       bypassDomain: config.networkProps.bypassDomain,
+      trafficStats: TrafficStatsOptions.fromProps(config.trafficStatsProps),
     );
   }
 
@@ -770,6 +782,33 @@ class GlobalState {
     );
   }
 
+  Future<void> exportProfileConfig(
+    Profile profile,
+    String output, {
+    required bool managed,
+    required bool refresh,
+  }) async {
+    final providersPath = managed
+        ? await appPath.getProvidersDirPath(profile.id)
+        : null;
+    final handler = clashLibHandler;
+    if (handler != null) {
+      return handler.exportConfig(
+        profile.id,
+        output,
+        ageSecretKey: profile.ageSecretKey,
+        providersPath: providersPath,
+      );
+    }
+    return clashCore.exportConfig(
+      profile.id,
+      output,
+      ageSecretKey: profile.ageSecretKey,
+      expandProviders: providersPath != null,
+      refresh: refresh,
+    );
+  }
+
   Future<Map<String, dynamic>> buildPatchParams({
     required ClashConfig patchConfig,
     required Profile profile,
@@ -787,20 +826,21 @@ class GlobalState {
     );
     final externalController = patchConfig.externalController;
     final secret = patchConfig.secret;
+    final hasSecret = secret != null && secret.isNotEmpty;
     final hasAuthentication = patchConfig.authentication.isNotEmpty;
     final general = <String, dynamic>{
-      'external-controller': patchConfig.allowLan
+      'external-controller': patchConfig.allowLan && hasSecret
           ? externalController.value.replaceAll('127.0.0.1', '0.0.0.0')
           : externalController.value,
-      if (externalController == ExternalControllerStatus.open &&
-          secret != null &&
-          secret.isNotEmpty)
+      if (externalController == ExternalControllerStatus.open && hasSecret)
         'secret': secret,
       'external-ui': await appPath.uiPath,
       'external-ui-url':
           'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip',
       'external-ui-name': '',
       'tcp-concurrent': patchConfig.tcpConcurrent,
+      if (!system.isAndroid && patchConfig.interfaceName.isNotEmpty)
+        'interface-name': patchConfig.interfaceName,
       'unified-delay': patchConfig.unifiedDelay,
       'ipv6': patchConfig.ipv6,
       'log-level': patchConfig.logLevel.name,
@@ -822,9 +862,8 @@ class GlobalState {
         'enable': tun.enable,
         'device': tun.device,
         if (tun.dnsMode case final dnsMode?) 'dns-mode': dnsMode.name,
-        'dns-hijack': tun.dnsHijack.isEmpty ? const ['any:53'] : tun.dnsHijack,
-        'stack': tun.stack.name,
-        'congestion-controller': tun.congestionController.name,
+        'dns-hijack': tun.dnsHijack,
+        'stack': (AppIdentity.isLite ? TunStack.mips : tun.stack).name,
         'route-address': tun.routeAddress,
         'route-exclude-address': tun.routeExcludeAddress,
         'auto-route': !system.isAndroid,
@@ -841,8 +880,6 @@ class GlobalState {
     };
 
     final overrideData = profile.overrideData;
-    final isRussian =
-        config.appSetting.locale?.toLowerCase().startsWith('ru') ?? false;
     final listenPorts = patchConfig.listenPorts;
 
     return {
@@ -852,12 +889,12 @@ class GlobalState {
         for (final host in patchConfig.hosts.entries)
           if (system.isAndroid || host.key != 'services.googleapis.cn')
             {'key': host.key, 'value': host.value.splitByMultipleSeparators},
-        {
-          'key': 'dns.msftncsi.com',
-          'value': ['131.107.255.255', 'fd3e:4f5a:5b81::1'],
-        },
+        if (system.isWindows)
+          {
+            'key': 'dns.msftncsi.com',
+            'value': ['131.107.255.255', 'fd3e:4f5a:5b81::1'],
+          },
       ],
-      'override-dns': config.overrideDns,
       'dns': {
         ...dns.toJson(),
         'nameserver-policy': {
@@ -877,10 +914,7 @@ class GlobalState {
       'node-exclude-filter': config.nodeExcludeFilter,
       'health-check-timeout': config.healthCheckTimeout,
       'override-rules': overrideData.enable
-          ? {
-              'override': overrideData.rule.type == OverrideRuleType.override,
-              'rules': overrideData.runningRule,
-            }
+          ? {'rules': overrideData.runningRule}
           : null,
       'prepend-rules': [
         if (config.vpnProps.loopbackProtection) ...[
@@ -892,9 +926,7 @@ class GlobalState {
             'AND,((DST-PORT,853),(IP-CIDR,198.51.100.0/30,no-resolve)),REJECT',
         ],
         if (config.vpnProps.disableQuic)
-          config.vpnProps.excludeChina && !isRussian
-              ? 'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((GEOSITE,geolocation-cn),(GEOIP,CN,no-resolve)))))),REJECT'
-              : 'AND,((NETWORK,UDP),(DST-PORT,443)),REJECT',
+          'AND,((NETWORK,UDP),(DST-PORT,443)),REJECT',
       ],
       'disabled-groups': [
         for (final entry in profile.groupSwitches.entries)
@@ -904,7 +936,7 @@ class GlobalState {
     };
   }
 
-  Future<Map<String, dynamic>> getProfileConfig(
+  Future<Map<String, dynamic>> getProfileSnippet(
     String profileId, {
     bool effective = false,
   }) async {
@@ -916,21 +948,20 @@ class GlobalState {
               if (!entry.value) entry.key,
           ]
         : const <String>[];
-    final configMap = await switch (clashLibHandler != null) {
+    return await switch (clashLibHandler != null) {
       true => clashLibHandler!.getConfig(
         profileId,
         ageSecretKey: ageSecretKey,
         disabledGroups: disabledGroups,
+        snippet: true,
       ),
       false => clashCore.getConfig(
         profileId,
         ageSecretKey: ageSecretKey,
         disabledGroups: disabledGroups,
+        snippet: true,
       ),
     };
-    configMap['rules'] = configMap['rule'];
-    configMap.remove('rule');
-    return configMap;
   }
 }
 
@@ -1011,6 +1042,8 @@ class DashboardRefreshManager {
   }
 }
 
+final _relayStampPattern = RegExp(r'^(?:scripted|profile)-(\d+)\.json$');
+
 final dashboardRefreshManager = DashboardRefreshManager();
 
 final globalState = GlobalState();
@@ -1027,6 +1060,10 @@ class DetectionState {
   String? _pendingCheckKey;
   bool _recheckOnFailure = false;
   bool _pendingInit = false;
+  String? _riskIp;
+  CancelToken? _riskToken;
+
+  final riskyIp = ValueNotifier<String?>(null);
 
   final state = ValueNotifier<NetworkDetectionState>(
     const NetworkDetectionState(
@@ -1061,6 +1098,7 @@ class DetectionState {
   void manualRefresh() {
     _rawIpInfo = null;
     _isIpMasked = false;
+    _riskIp = null;
     state.value = state.value.copyWith(
       isLoading: true,
       ipInfo: null,
@@ -1078,30 +1116,62 @@ class DetectionState {
       ipInfo: _maskIpInfo(_rawIpInfo),
       errorMessage: null,
     );
+    _scheduleRiskCheck();
   }
 
-  Future<void> switchToDomesticIp() async {
-    _rawIpInfo = null;
-    _isIpMasked = false;
-
-    _cancelPreviousRequest();
-    _cancelToken = CancelToken();
-    final requestId = ++_requestId;
-
-    state.value = state.value.copyWith(
-      isLoading: true,
-      ipInfo: null,
-      errorMessage: null,
+  Future<void> _scheduleRiskCheck() async {
+    final ip = _rawIpInfo?.ip;
+    if (ip == null || ip == _riskIp) return;
+    _riskIp = ip;
+    _riskToken?.cancel();
+    debouncer.cancel(FunctionTag.checkIpRisk);
+    riskyIp.value = null;
+    if (!globalState.hasNetworkDetectionWidget ||
+        !globalState.config.appSetting.ipRiskAlert ||
+        utils.classifyIp(ip) != IpCategory.public) {
+      return;
+    }
+    final cached = await request.readIpRiskCache(ip);
+    if (ip != _riskIp) return;
+    if (cached != null) {
+      _applyRisk(ip, cached);
+      return;
+    }
+    debouncer.call(
+      FunctionTag.checkIpRisk,
+      _checkRisk,
+      args: [ip],
+      duration: const Duration(seconds: 2),
     );
+  }
 
-    final res = await request.checkIpDomestic(
-      cancelToken: _cancelToken,
-      onUpdate: (info) => _onIpProgress(requestId, info),
-    );
+  void _applyRisk(String ip, IpRisk? risk) {
+    final level = risk?.level;
+    riskyIp.value = level != null && level != IpRiskLevel.low ? ip : null;
+  }
 
-    if (requestId != _requestId) return;
+  void refreshRiskCheck() {
+    _riskIp = null;
+    _scheduleRiskCheck();
+  }
 
-    _handleResponse(res);
+  Future<void> _checkRisk(String ip) async {
+    if (!globalState.hasNetworkDetectionWidget ||
+        !globalState.config.appSetting.ipRiskAlert) {
+      return;
+    }
+    final token = _riskToken = CancelToken();
+    final res = await request
+        .queryIpRisk(ip, cancelToken: token)
+        .timeout(
+          const Duration(seconds: 5),
+          onTimeout: () {
+            token.cancel();
+            return Result.error('timeout');
+          },
+        );
+    if (ip != _riskIp) return;
+    _applyRisk(ip, res.data);
   }
 
   void startCheck({
@@ -1200,6 +1270,7 @@ class DetectionState {
                 ? appLocalizations.tryManualRefresh
                 : null),
     );
+    _scheduleRiskCheck();
   }
 
   Future<void> _checkIp({bool showLoading = false, bool force = false}) async {
@@ -1243,17 +1314,11 @@ class DetectionState {
 
     final timeout = const Duration(seconds: 8);
 
-    final res = isStart
-        ? await request.checkIp(
-            cancelToken: _cancelToken,
-            timeout: timeout,
-            onUpdate: (info) => _onIpProgress(requestId, info),
-          )
-        : await request.checkIpDomestic(
-            cancelToken: _cancelToken,
-            timeout: timeout,
-            onUpdate: (info) => _onIpProgress(requestId, info),
-          );
+    final res = await request.checkIp(
+      cancelToken: _cancelToken,
+      timeout: timeout,
+      onUpdate: (info) => _onIpProgress(requestId, info),
+    );
 
     if (requestId != _requestId) return;
     _pendingCheckKey = null;

@@ -58,7 +58,9 @@ class EditProfileViewState extends State<EditProfileView> {
       unawaited(focusNode.requestFocusWhenIdle());
     }
     appPath.getProfilePath(widget.profile.id).then((path) async {
-      fileInfoNotifier.value = await _getFileInfo(path);
+      final fileInfo = await _getFileInfo(path);
+      if (!mounted) return;
+      fileInfoNotifier.value = fileInfo;
     });
   }
 
@@ -69,6 +71,7 @@ class EditProfileViewState extends State<EditProfileView> {
     autoUpdateDurationController.dispose();
     ageSecretKeyController.dispose();
     urlFocusNode?.dispose();
+    fileInfoNotifier.dispose();
     super.dispose();
   }
 
@@ -181,10 +184,33 @@ class EditProfileViewState extends State<EditProfileView> {
     final bytes = await platformFile.readAsBytes();
     if (bytes.isEmpty) return;
     fileData = bytes;
+    if (!mounted) return;
     fileInfoNotifier.value = fileInfoNotifier.value?.copyWith(
       size: fileData?.length ?? 0,
       lastModified: DateTime.now(),
     );
+  }
+
+  Future<void> _exportProfileFile() async {
+    final res = await globalState.appController.safeRun<bool>(
+      () async {
+        final bytes = fileData ?? await (await profile.getFile()).readAsBytes();
+        final rawName = (profile.label ?? profile.id).trim();
+        final fileName = (rawName.endsWith('.yaml') || rawName.endsWith('.yml'))
+            ? rawName
+            : '$rawName.yaml';
+        final value = await picker.saveFile(
+          fileName,
+          bytes,
+          allowedExtensions: ['yaml', 'yml'],
+        );
+        return value != null;
+      },
+      needLoading: true,
+      title: appLocalizations.tip,
+    );
+    if (res != true || !mounted) return;
+    context.showNotifier(appLocalizations.exportSuccess);
   }
 
   Future<void> _handleBack() async {
@@ -349,6 +375,11 @@ class EditProfileViewState extends State<EditProfileView> {
                                     label: appLocalizations.upload,
                                     onPressed: _uploadProfileFile,
                                   ),
+                                  CommonChip(
+                                    avatar: const Icon(Icons.download),
+                                    label: appLocalizations.exportFile,
+                                    onPressed: _exportProfileFile,
+                                  ),
                                 ],
                               ),
                             ],
@@ -454,6 +485,7 @@ class _AgeKeyGeneratorDialogState extends State<_AgeKeyGeneratorDialog> {
         final result = await clashCore.convertAgeSecretKeyToPublicKey(
           privateKey,
         );
+        if (!mounted) return;
         if (result.isSuccess &&
             result.data != null &&
             result.data!.isNotEmpty) {
@@ -467,13 +499,16 @@ class _AgeKeyGeneratorDialogState extends State<_AgeKeyGeneratorDialog> {
           });
         }
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _helperText = appLocalizations.agePrivateKeyRequired;
         });
       } finally {
-        setState(() {
-          _isGenerating = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isGenerating = false;
+          });
+        }
       }
     } else {
       setState(() {
@@ -482,6 +517,7 @@ class _AgeKeyGeneratorDialogState extends State<_AgeKeyGeneratorDialog> {
 
       try {
         final keyPair = await clashCore.generateAgeKeyPair();
+        if (!mounted) return;
         final secKey = keyPair['secret-key'] ?? '';
         final pubKey = keyPair['public-key'] ?? '';
 
@@ -493,13 +529,16 @@ class _AgeKeyGeneratorDialogState extends State<_AgeKeyGeneratorDialog> {
           });
         }
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _helperText = e.toString();
         });
       } finally {
-        setState(() {
-          _isGenerating = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isGenerating = false;
+          });
+        }
       }
     }
   }
