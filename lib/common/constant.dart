@@ -48,6 +48,7 @@ const customDashboardTitleKey = 'custom_dashboard_title';
 const lastManagedScriptVersionKey = 'last_managed_script_version';
 const double dialogCommonWidth = 300;
 const repository = 'appshubcc/Bettbox';
+const releaseRepository = 'reddishJade/Bettbox';
 const ipInfoToken = String.fromEnvironment('IPINFO_TOKEN', defaultValue: '');
 const defaultExternalController = '127.0.0.1:9090';
 const maxMobileWidth = 600;

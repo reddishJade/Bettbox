@@ -1507,7 +1507,8 @@ class AppController {
         return;
       }
       const String assetSuffix = String.fromEnvironment('APP_ASSET_SUFFIX');
-      String downloadUrl = 'https://github.com/$repository/releases/latest';
+      String downloadUrl =
+          'https://github.com/$releaseRepository/releases/latest';
 
       if (assetSuffix.isNotEmpty) {
         final versionWithoutV = tagName.startsWith('v')
@@ -1518,7 +1519,7 @@ class AppController {
           finalSuffix = 'windows-amd64-compatible-portable.zip';
         }
         downloadUrl =
-            'https://github.com/$repository/releases/download/$tagName/Bettbox-$versionWithoutV-$finalSuffix';
+            'https://github.com/$releaseRepository/releases/download/$tagName/Bettbox-$versionWithoutV-$finalSuffix';
       }
 
       globalState.openUrl(downloadUrl);

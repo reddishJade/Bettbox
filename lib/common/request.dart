@@ -357,7 +357,7 @@ class Request {
     try {
       final t = DateTime.now().millisecondsSinceEpoch;
       final response = await _dio.get(
-        'https://github.com/$repository/releases/latest?t=$t',
+        'https://github.com/$releaseRepository/releases/latest?t=$t',
         options: Options(
           followRedirects: false,
           validateStatus: (status) =>
@@ -378,7 +378,7 @@ class Request {
           if (!hasUpdate) return null;
           return {
             'tag_name': remoteVersion,
-            'html_url': 'https://github.com/$repository/releases/latest',
+            'html_url': 'https://github.com/$releaseRepository/releases/latest',
             'body': 'New version available. Please visit GitHub to download.',
           };
         }
