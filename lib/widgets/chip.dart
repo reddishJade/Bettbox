@@ -23,7 +23,8 @@ class CommonChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (type == ChipType.action) {
+    if (type == ChipType.action &&
+        MediaQuery.textScalerOf(context).scale(14) <= 14) {
       return _ActionChip(
         label: label,
         labelStyle: labelStyle,
@@ -43,6 +44,19 @@ class CommonChip extends StatelessWidget {
       }
       return null;
     });
+    if (type == ChipType.action) {
+      return ActionChip(
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        avatar: avatar,
+        side: focusedBorder,
+        color: focusedColor,
+        clipBehavior: Clip.antiAlias,
+        labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+        onPressed: () => onPressed?.call(),
+        labelStyle: labelStyle,
+        label: EmojiText(label),
+      );
+    }
     return Chip(
       avatar: avatar,
       side: focusedBorder,

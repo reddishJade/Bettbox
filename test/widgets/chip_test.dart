@@ -157,7 +157,13 @@ void main() {
             await tester.pumpAndSettle();
 
             final referenceSizes = [
-              for (final element in find.byType(ActionChip).evaluate())
+              for (final element
+                  in find
+                      .descendant(
+                        of: find.byKey(referenceKey),
+                        matching: find.byType(ActionChip),
+                      )
+                      .evaluate())
                 element.size,
             ];
             final candidateSizes = [
